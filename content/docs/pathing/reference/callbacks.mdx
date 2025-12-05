@@ -12,10 +12,12 @@ Pedro Pathing has a couple built-in callback types:
     - Executes after a certain percentage (calculated by distance traveled) of the path is exceeded
     - These are the most recommended callback to use
     - Can be added to a chain in the `PathBuilder` using `.addParametricCallback(double percent, Runnable action)` where `percent` is the percent completion of the previous path required to run `action`
+    - WARNING: A parametric callback whose trigger percentage exceeds the path’s TValueConstraint (typically <1.0) may or may not run. If the follower’s `update()` ends the path chain or advances to the next path in the chain after the follower reaches the path’s TValueConstraint but before the robot passes the callback’s trigger percentage, the callback will not fire. However, it will fire if the robot passes the trigger percentage before that `update()`. A callback set to trigger at 1.0 is therefore likely to run intermittently.
 2. Temporal
     - Executes a certain amount of time after the robot begins following the path.
     - These are not really recommended as they are inconsistent, given that Pedro's follower isn't based on time and the robot won't be guaranteed to be in the same spot between trials when the action is run.
     - Can be added to a chain in the `PathBuilder` using `.addTemporalCallback(double millis, Runnable action)` such that `action` executes after the `millis` amount has passed since the robot began following this path.
+    - WARNING: A temporal callback will not execute if the path finishes before the specified trigger time.
 3. Pose
     - Executes after the robot passes the point on a path closest to a given `Pose`
     - The user inputs a `Pose` and the follower evaluates the closest point on the path to this pose. As the robot drives along the path, if it crosses this closest point, the action is run.
