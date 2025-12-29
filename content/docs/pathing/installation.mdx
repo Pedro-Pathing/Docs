@@ -5,7 +5,7 @@ description: Installing Pedro Pathing
 
 import PedroImplementation from "@/app/PedroImplementation";
 
-There are two ways to install Pedro Pathing.
+There are two ways to install Pedro Pathing. The quickstart is for people who don't have code for their robot yet, if you do have code for your robot then use the manual installation.
 
 ## Using the Quickstart
 
@@ -41,5 +41,17 @@ has appeared.
 Then, navigate to `File > Project Structure > Modules` and change the `Compile Sdk Version` to 34 for `FtcRobotController` and `TeamCode`.
 Then press `Apply` and `OK`.
 
-Lastly, copy the files from the [`pedroPathing` package in the quickstart](https://github.com/Pedro-Pathing/Quickstart/tree/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedroPathing)
-into your code.
+Lastly, run the following commands as stated based on your operating system:
+
+### Linux and macOS:
+#### **Run these commands in your main folder with your robot code:**
+
+```groovy
+curl -O https://pedropathing.com/manualinstall.sh
+sudo chmod +x manualinstall.sh
+./manualinstall.sh
+```
+
+### Windows:
+Copy the files from the [`pedroPathing` package in the quickstart](https://github.com/Pedro-Pathing/Quickstart/tree/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedroPathing)
+into your code. More simplicity for Windows install coming soon.
