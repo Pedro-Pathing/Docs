@@ -23,9 +23,14 @@ Follow this video to help you tune the PIDF(s):
 
 **If you have a dual PIDF system enabled,** it is recommended to first tune the main PIDF, `coefficientsTranslationalPIDF`, to ensure that the robot can correct from large errors and bring it within the secondary PID's range. Then, tune the secondary PIDF, `coefficientsSecondaryTranslationalPIDF`, so the robot can smoothly correct from smaller errors and minimize oscillations. 
 
-**Note:** Don't worry if the robot doesn't correct its heading. We are only tuning for the translational PIDF: whether the robot corrects left/right appropriately. 
+<Callout title="Tuning Tips" type="info">
+ Don't worry if the robot does not correct its heading. We are only tuning translational PIDF: whether the robot corrects left/right appropriately. 
+</Callout>
 
-**Warning:** After adjusting a value in Panels, **hit "enter"** in order to save it and cause the robot to correct differently. However, any values you modify through Panels **are not saved into your code!** In order to transfer the values you just tuned on Panels into your code, go to the **Update Tuned Values** section.  
+
+<Callout title="Warning!" type="warning">
+After adjusting a value in Panels, **hit "enter"** in order to save it and cause the robot to correct differently. However, any values you modify through Panels **are not saved into your code!** In order to transfer the values you just tuned on Panels into your code, go to the **Update Tuned Values** section.  
+</Callout>
 
 ### Feedforward Adjustments (Optional)
 
