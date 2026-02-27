@@ -7,6 +7,7 @@
     "path-builder",
     "pathcomplete",
     "beziercurves",
+    "predictive",
     "drive-vector-algorithm",
     "callbacks",
     "speed-control"
