@@ -7,12 +7,21 @@ description: Tuning the centripetal scaling
 
 The centripetal force correction enables the robot to accurately follow curved paths.
 
-### Setup 
+### Setup
 
-1. Open Panels. If you haven't used Panels before, you can read the documentation on [Panels Configurables](https://panels.bylazar.com/docs/com.bylazar.configurables/).
-2. On your Driver Hub or Driver Station, select the `Tuning` Opmode, navigate to `Manual` and then choose `CentripetalTuner`. 
-3. Ensure that the timer for autonomous OpModes is **disabled.** Otherwise, the OpMode will automatically stop after 30 seconds.
-4. Run the run the `CentripetalTuner` autonomous OpMode.
+1. Set your robot's mass
+Your robot's mass is used to compensate for centripetal force. To set the
+mass, simply add `.mass` in `FollowerConstants`. Note that the mass **must
+be in kilograms**.
+
+```java title="Constants.java"
+public static FollowerConstants followerConstants = new FollowerConstants()
+        .mass(5);
+```
+2. Open Panels. If you haven't used Panels before, you can read the documentation on [Panels Configurables](https://panels.bylazar.com/docs/com.bylazar.configurables/).
+3. On your Driver Hub or Driver Station, select the `Tuning` Opmode, navigate to `Manual` and then choose `CentripetalTuner`.
+4. Ensure that the timer for autonomous OpModes is **disabled.** Otherwise, the OpMode will automatically stop after 30 seconds.
+5. Run the run the `CentripetalTuner` autonomous OpMode.
 
 **WARNING: Immediately after running the `Centripetal Tuner` Opmode, the robot will move forward and left 20 inches in a curved path. Make sure you have enough space before running this opmode.**
 You can adjust the distance the robot drives back and forth through Panels. 

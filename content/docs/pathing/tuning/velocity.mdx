@@ -1,0 +1,50 @@
+---
+title: Velocity Tuners
+description: Determines the forward vs lateral velocity of your robot
+---
+
+## Forward Velocity Tuner
+
+<Callout title="Purpose" type="info">
+  The Forward Velocity Tuner determines the velocity of your robot when moving forward at full power.
+  This value is used for accurate path-following calculations in Pedro Pathing.
+</Callout>
+
+First, make sure you have enough room. By default, the robot moves 48 inches forward, but this can be
+changed by navigating to the `ForwardVelocityTuner` class in `Tuning.java`. Typically larger numbers yield
+better results. Then, in the Tuning OpMode, under automatic, select and start Forward Velocity Tuner. The
+robot speed should ramp up until it reaches full power. It will continue moving until it has reached the set distance,
+then it will abruptly stop.
+
+Once the robot stops moving at maximum speed, one number will be displayed on telemetry:
+
+- Velocity: The final velocity the robot achieved before stopping; this is what we want
+
+Add the velocity to `MecanumConstants` by adding or editing the following.
+
+```java title="Constants.java"
+.xVelocity(velocity)
+```
+
+## Lateral Velocity Tuner
+
+<Callout title="Purpose" type="info">
+  The Lateral Velocity Tuner determines the velocity of your robot when moving sideways at full power.
+  This value is used for accurate path-following calculations in Pedro Pathing.
+</Callout>
+
+First, make sure you have enough room. By default, the robot moves 48 inches to the left, but this can be
+changed by navigating to the `LateralVelocityTuner` class in `Tuning.java`. Typically larger numbers yield
+better results. Then, in the Tuning OpMode, under automatic, select and start Lateral Velocity Tuner. The
+robot speed should ramp up until it reaches full power. It will continue moving until it has reached the set distance,
+then it will abruptly stop.
+
+Once the robot stops moving at maximum speed, one number will be displayed on telemetry:
+
+- Velocity: The final velocity the robot achieved before stopping; this is what we want
+
+Add the velocity to `MecanumConstants` by adding or editing the following.
+
+```java title="Constants.java"
+.yVelocity(velocity)
+```
