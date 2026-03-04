@@ -1,0 +1,56 @@
+---
+title: Swerve Constants
+description: Setting up constants for a swerve drivetrain
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Swerve Constants
+
+Next, we will create our drivetrain constants and construct our pods.
+
+```java title="Constants.java"
+public static SwerveConstants swerveConstants = new SwerveConstants()
+        .maxPower(1) //determines the max power of the drivetrain
+//      .zeroPowerBehavior(SwerveConstants.ZeroPowerBehavior.IGNORE_ANGLE_CHANGES)
+        //the above disables x locking for swerve, which can be useful for tuning pod offsets
+```
+
+Now we will construct our `SwervePod` objects.
+Pedro has two types of `SwervePod`s, `CoaxialPod` and `DiffyPod`.
+To setup your drivetrain, you will need to create a method to construct each of your pods, which you
+will then pass into the swerve drivetrain.
+
+An example of a method creating a `CoaxialPod` is shown below.
+
+```java title="Constants.java"
+private static CoaxialPod leftFront(HardwareMap hardwareMap) {
+    CoaxialPod pod = new CoaxialPod(
+            hardwareMap,
+            "leftFrontMotor", //the name of your motor in your config
+            "leftFrontServo", //the name of your servo in your config
+            "leftFrontEncoder", // the name of your analog encoder in your config
+            new PIDFCoefficients(0.3, 0, 0.005, 0.01), //pod PIDF coefficients
+            DcMotorSimple.Direction.FORWARD, //the direction of your motor
+            DcMotorSimple.Direction.FORWARD, //the direction of your servo
+            Math.toRadians(353.1), //your pod's angle offset, in radians
+            new Pose(dtLength, dtWidth), //your pods x and y offsets, in pedro coordinates
+            0 //analog min voltage
+            3.3, //analog max voltage
+            false); //encoder inverted
+//  pod.setMotorCachingThreshold(0.05);
+//  pod.setServoCachingThreshold(0.05);
+    return pod;
+}
+```
+
+Then, add the mecanum drivetrain to the follower builder in `createFollower`:
+
+```java title="Constants.java"
+public static Follower createFollower(HardwareMap hardwareMap) {
+        return new FollowerBuilder(followerConstants, hardwareMap)
+                .pathConstraints(pathConstraints)
+                .mecanumDrivetrain(driveConstants)
+                .build();
+}
+```
