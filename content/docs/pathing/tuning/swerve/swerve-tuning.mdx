@@ -1,0 +1,42 @@
+---
+title: Swerve Tuning
+description: Preliminary tuning for a (coaxial) swerve drivetrain up to getting teleop to work!
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+## Analog Encoder Min / Max Voltage
+To get the best performance out of your drivetrain, you need to be able to get the angle of your servos to high precision.
+Most coaxial swerve drivetrains in FTC use the analog encoders on their rotation servos to get the angle. In theory, the analog
+values should vary between 0 and 3.3v, but in practice the min and max voltages are often close but not exactly those.
+
+To get the most precision out of your pods, you want to get the actual minimum and maximum voltages of your encoders.
+To do this, run `Analog Min / Max Tuner` in the swerve section of the `Tuning` opmode. After you press start, slowly rotate each
+pod four to five full rotations. The min and max voltages of each pod should be printed to telemetry.
+<Callout title="Note" type="info">
+  For this opmode, and this one only, you will need to modify the `Tuning.java` file to match your encoder names to your config.
+  Modify the `encoderNames` array on line 1440.
+</Callout>
+
+One you have the values for each pod, put them into your each of your pod creation methods in `Constants.java`.
+
+## Angle Offset Tuning
+Next, we need to tune the angle offset of each pod. After you have tuned the min and max voltages, a full rotation of each pod should map to 
+exactly 360 degrees. However, the code still needs to know the precise angle at a specific position. To do this, you add angle offsets to each pod,
+which is the raw angle of the pod in radians when they are at your desired zero position (facing forward).
+
+To tune this, first temporarily disable x lock for the drivetrain (set the zero power behavior to IGNORE_ANGLE_CHANGES). Then, run `LocalizationTest`
+in the `Tuning` opmode, making sure to enable the drivetrain debug string by pressing a on the gamepad when prompted. Then, manually line up each pod
+to your zero position, facing the pod forward. The the raw angle of each pod will be printed to telemetry. Insert the raw angle (in radians) when the pod
+is at the zero position as the angle offset for that pod.
+
+<Callout title="Tip" type="info">
+  Be consistent with how you define "forward" for each pod, flipping the pod 180 degrees changes the offset. While it doesn't strictly matter, being
+  consistent (for example having all your bevel gears face left) will make debugging easier if problems arise.
+</Callout>
+
+## Motor Directions
+After you put your angle offsets in, we need to confirm that they are correct and that the motors are reversed correctly. First, if you haven't already,
+put in the placeholder pod PIDF coefficients for each pod (kP = 0.3, kI = 0, kD = 0.005, kF = 0). 
+
+```
