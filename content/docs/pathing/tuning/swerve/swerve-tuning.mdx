@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout'
 ## Analog Encoder Min / Max Voltage
 To get the best performance out of your drivetrain, you need to be able to get the angle of your servos to high precision.
 Most coaxial swerve drivetrains in FTC use the analog encoders on their rotation servos to get the angle. In theory, the analog
-values should vary between 0 and 3.3v, but in practice the min and max voltages are often close but not exactly those.
+values should vary between 0 and 3.3V, but in practice the min and max voltages are often close but not exactly those.
 
 To get the most precision out of your pods, you want to get the actual minimum and maximum voltages of your encoders.
 To do this, run `Analog Min / Max Tuner` in the swerve section of the `Tuning` opmode. After you press start, slowly rotate each
@@ -18,7 +18,7 @@ pod four to five full rotations. The min and max voltages of each pod should be 
   Modify the `encoderNames` array on line 1440.
 </Callout>
 
-One you have the values for each pod, put them into your each of your pod creation methods in `Constants.java`.
+Once you have the values for each pod, put them into your each of your pod creation methods in `Constants.java`.
 
 ## Angle Offset Tuning
 Next, we need to tune the angle offset of each pod. After you have tuned the min and max voltages, a full rotation of each pod should map to 
@@ -27,7 +27,7 @@ which is the raw angle of the pod in radians when they are at your desired zero 
 
 To tune this, first temporarily disable x lock for the drivetrain (set the zero power behavior to IGNORE_ANGLE_CHANGES). Then, run `LocalizationTest`
 in the `Tuning` opmode, making sure to enable the drivetrain debug string by pressing a on the gamepad when prompted. Then, manually line up each pod
-to your zero position, facing the pod forward. The the raw angle of each pod will be printed to telemetry. Insert the raw angle (in radians) when the pod
+to your zero position, facing the pod forward. The raw angle of each pod will be printed to telemetry. Insert the raw angle (in radians) when the pod
 is at the zero position as the angle offset for that pod.
 
 <Callout title="Tip" type="info">
@@ -38,5 +38,84 @@ is at the zero position as the angle offset for that pod.
 ## Motor Directions
 After you put your angle offsets in, we need to confirm that they are correct and that the motors are reversed correctly. First, if you haven't already,
 put in the placeholder pod PIDF coefficients for each pod (kP = 0.3, kI = 0, kD = 0.005, kF = 0). 
+Then, run `Swerve Offsets Test` in the `Tuning` opmode (do this off the ground, the servos and motors will spin). This opmode will attempt to drive each pod to its zero position. However, there are a few
+expected reasons for this to fail. Follow these debug steps for each type of failure:
+1. **The pods oscillate a lot**: By far the most common issue here is that your servos (not encoders) need to be reversed. Reverse your servos
+and try again. If the issue persists, try turning down the default PIDF coefficients and see if that helps.
+2. **The servos move to the wrong position**: First, check that the servos are holding their positions. It's possible that they are trying to move
+to the zero position but the default PIDF coefficients aren't strong enough to get them there. Give them a nudge towards their zero positions and see
+if they move easily towards it. If so, turn up the PIDF coefficients and try again. Otherwise, you probably set up bad angle offsets. Repeat the Angle
+Offset Tuning steps above to make sure they are correct. If neither of those steps work, it's likely that the servos are not plugged in correctly to their
+corresponding encoders. Ensure that the servo and encoder ports match up.
+3. **The servos don't move at all**: If the servos don't move at all, it's possible that the servos aren't plugged in correctly or that the pod PIDF
+coefficients are too low. Make sure that they are plugged in correctly, and then try turning up the PIDF coefficients and see if that helps.
 
-```
+If none of the above steps work to have the servos move to their zero positions, then you probably have an issue with wiring. Go through and make sure
+that all of your servo, encoder, and motor ports are plugged in correctly.
+
+Once all your servos move to their zero positions, now you can check the directions of your motors. The pods should all be rotating to move the robot forward
+(regardless of whether the pods are facing forward or backward). Reverse all the motors in pods that are turning the wrong direction.
+
+If you have completed all of the above steps correctly, when running `Swerve Offsets Test`, the robot should drive forward slowly when you put it on the ground.
+
+## Lateral Offsets
+Now you need to find in your lateral offset (as a Pose). These not tuned, but found through measurement on the robot or CAD. Lateral offsets represent
+the relative position of the pod to the center of the robot using pedro's coordinate system (positive x is forward, positive y is left). The nice thing
+about these is that the offsets are normalized, meaning only the relative x and y values matter (i.e. `new Pose(1,1)` and `new Pose(1000, 1000)` are
+the same). Thus, I've found that the easiest way to do these is to measure the length and width of your robot drivetrain. If you do that and store
+the values in two variables `dtLength` and `dtWidth`, your offsets will be as follows (assuming your swerve is rectangular):
+* Front Left: `new Pose(dtLength, dtWidth)`
+* Front Right: `new Pose(dtLength, -dtWidth)`
+* Back Left: `new Pose(-dtLength, dtWidth)`
+* Back Right: `new Pose(-dtLength, -dtWidth)`
+
+I'm super specific with these is because these are easy to get right if you're appropriately careful but annoying to debug if you mess them up.
+
+## Encoder Directions
+Next, we need to confirm that the encoders are reversed correctly. First, take your robot off of the ground such that you can see the wheels:
+then, run `Swerve Turn Test` in the `Tuning` opmode's swerve section. Your pods should turn to be perpendicular to the center of the robot, forming
+an "O" shape so the robot can turn. If your pods all turn towards the center and form an "X" shape, then reverse all of your encoders (flip the boolean
+parameter) and try again.
+
+Once your pods face the correct direction, ensure that the motors are all running the correct direction to turn the robot counterclockwise. If any of
+the motors are running the wrong direction, but they are all correct for the `Swerve Offsets Test` to move your robot forward, then you almost certainly
+have a wiring issue. Make sure that all of your motors correctly match up with their corresponding servos and encoders in your config. If that still
+doesn't work, check your lateral offsets.
+
+## Pod PIDF Tuning
+Finally, you need to tune your pod PIDF coefficients. You can do this using whatever method you prefer to tune your PIDFs. What I've found to work
+best is to use LocalizationTest to set target positions, and first tune P and D while the robot is off the ground. Once you've tuned to your satisfaction,
+move the robot onto the ground and tune F to account for the friction with the tiles and fine tuning P and D. For my bot, I've used the same P and D
+for all four pods, but I have separate F values for the front and back pods because my robot is back heavy. You should adjust this for your robot's
+weight distribution, and some teams prefer to tune the P, D, and F values for each pod individually.
+
+<Callout title="Note" type="warning">
+  Remember to reenable x-lock after you are done if you want it (recommended). Just comment out the `IGNORE_ANGLE_CHANGES` line in `Tuning.java`,
+  or you can explicitly set the zero power behavior to `X_LOCK`.
+</Callout>
+
+## Tips for Tuning
+Congratulations! You've now completed the swerve-specific tuning steps. You can now move onto [localization tuning](/docs/pathing/tuning/localization)
+and the rest of standard pedro tuning.
+
+Some tips for the getting the most out of tuning:
+1. When you get to the `ForwardVelocityTuner` and `ForwardZeroPowerAccelerationTuner` tuners, you don't need to do the lateral variants because with swerve
+they are equivalent. You can just use the same values for both.
+2. You need to retune your zero power acceleration if you switch from using X-lock to not using it and vice versa. When using X-lock, the robot can decelerate
+much faster than without (the difference was about -200 vs -130 in my case), and this affects the robot's ability to stop at the correct position. I would
+recommend using X-lock unless you have a reason not to.
+3. Swerve is currently not compatible with Predictive Braking; predictive braking is too aggressive and causes oscillations because swerve pods cannot
+instantaneously change direction like mecanum wheels can. We are looking into potential solutions to this, but predictive braking also isn't as needed for swerve
+because of the much higher natural deceleration as compared to mecanum, especially when using X-lock.
+4. When tuning your heading and translational PIDs, I would highly recommend NOT using F values. Like with predictive braking, F values tend to cause
+oscillations in swerve because swerve pods cannot change direction instantaneously.
+5. In general, stay conservative with your heading and translational PIDs. While slightly higher values can make the robot more responsive, oscillations
+when driving slow down the robot **significantly**, so I've found that getting decent responsiveness while minimizing oscillations is the most effective
+tuning strategy. On that note, I would highly recommend using secondary PIDs for all three pathing PIDs. If your secondaries are decently less aggressive
+than your primaries, you can significantly improve responsiveness while minimizing oscillations.
+6. I've found that a very low centripetal scaling value (like 0.0005) can also helps minimize oscillations when following splines (I think the improved
+traction compared to mecanum means the centripetal friction on swerve is higher, meaning less compensation is needed)
+
+There is also a [swerve constants reference page](/docs/pathing/tuning/swerve/swerve-constants-example) that you can use to see a fully setup `Constants`
+file using swerve. Finally, if you have any other questions, please feel free to reach out to me (@_kubar) on discord through the Pedro discord server
+(preferred) or DMs.
