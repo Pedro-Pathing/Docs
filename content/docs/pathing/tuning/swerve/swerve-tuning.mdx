@@ -50,8 +50,8 @@ corresponding encoders. Ensure that the servo and encoder ports match up.
 3. **The servos don't move at all**: If the servos don't move at all, it's possible that the servos aren't plugged in correctly or that the pod PIDF
 coefficients are too low. Make sure that they are plugged in correctly, and then try turning up the PIDF coefficients and see if that helps.
 
-If none of the above steps work to have the servos move to their zero positions, then you probably have an issue with wiring. Go through and make sure
-that all of your servo, encoder, and motor ports are plugged in correctly.
+If none of the above steps get the servos move to their zero positions, then you probably have an issue with wiring. Go through and make sure
+that all of your servo, encoder, and motor wires are plugged in to the correct ports.
 
 Once all your servos move to their zero positions, now you can check the directions of your motors. The pods should all be rotating to move the robot forward
 (regardless of whether the pods are facing forward or backward). Reverse all the motors in pods that are turning the wrong direction.
@@ -104,10 +104,10 @@ they are equivalent. You can just use the same values for both.
 2. You need to retune your zero power acceleration if you switch from using X-lock to not using it and vice versa. When using X-lock, the robot can decelerate
 much faster than without (the difference was about -200 vs -130 in my case), and this affects the robot's ability to stop at the correct position. I would
 recommend using X-lock unless you have a reason not to.
-3. Swerve is currently not compatible with Predictive Braking; predictive braking is too aggressive and causes oscillations because swerve pods cannot
+3. Swerve is currently not compatible with predictive braking; predictive braking is too aggressive and causes oscillations because swerve pods cannot
 instantaneously change direction like mecanum wheels can. We are looking into potential solutions to this, but predictive braking also isn't as needed for swerve
 because of the much higher natural deceleration as compared to mecanum, especially when using X-lock.
-4. When tuning your heading and translational PIDs, I would highly recommend NOT using F values. Like with predictive braking, F values tend to cause
+4. When tuning your heading and translational PIDs, I would highly recommend **NOT** using F values. Like with predictive braking, F values tend to cause
 oscillations in swerve because swerve pods cannot change direction instantaneously.
 5. In general, stay conservative with your heading and translational PIDs. While slightly higher values can make the robot more responsive, oscillations
 when driving slow down the robot **significantly**, so I've found that getting decent responsiveness while minimizing oscillations is the most effective
