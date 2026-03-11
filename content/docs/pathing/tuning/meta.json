@@ -5,6 +5,7 @@
     "automatic",
     "pids",
     "tests",
+    "swerve",
     "troubleshooting"
   ]
 }
