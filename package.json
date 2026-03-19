@@ -20,6 +20,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "rehype-katex": "^7.0.1",
+    "remark-directive": "^4.0.0",
     "remark-math": "^6.0.0",
     "typeit-react": "^2.7.8"
   },

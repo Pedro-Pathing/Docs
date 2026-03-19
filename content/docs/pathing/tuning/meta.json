@@ -4,8 +4,8 @@
     "swerve",
     "localization",
     "velocity",
-    "pids",
-    "predictive",
+    "heading",
+    "drive-algorithm",
     "tests",
     "troubleshooting"
   ]

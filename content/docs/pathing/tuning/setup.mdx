@@ -26,6 +26,10 @@ public static FollowerConstants followerConstants = new FollowerConstants()
 Next, we will add our drivetrain constants. These include motor names, motor
 directions, and the max power. The max power must be a number from 0 to 1.
 
+### Swerve
+If you have a swerve drivetrain, please refer to the dedicated [swerve page](/docs/pathing/tuning/swerve/swerve-setup)
+for tuning instructions.
+
 ### Mecanum
 
 If you have a mecanum drivetrain, add the following to your `Constants` class.
@@ -58,7 +62,3 @@ public static Follower createFollower(HardwareMap hardwareMap) {
                 .build();
 }
 ```
-
-### Swerve
-If you have a swerve drivetrain, please refer to the dedicated [swerve page](/docs/pathing/tuning/swerve/swerve-setup)
-for tuning instructions.
