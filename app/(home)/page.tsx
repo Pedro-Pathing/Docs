@@ -11,7 +11,7 @@ export const metadata: Metadata = {
       {
         url: 'https://pedropathing.com/banner.png',
         width: 1200,
-        height: 200,
+        height: 686,
       },
     ],
     locale: 'en_US',

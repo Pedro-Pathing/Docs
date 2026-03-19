@@ -11,8 +11,13 @@ const readFont = (fileName: string) => {
   return fs.readFile(fontPath);
 };
 
-const interRegular = readFont('Inter-Regular.ttf');
-const interBold = readFont('Inter-Bold.ttf');
+const interRegular = readFont('InstrumentSans-Regular.ttf');
+const interBold = readFont('InstrumentSans-Bold.ttf');
+
+const readImage = (fileName: string) => {
+  const imgPath = path.join(process.cwd(), 'public', fileName);
+  return fs.readFile(imgPath);
+};
 
 export async function GET(
   _req: Request,
@@ -21,10 +26,12 @@ export async function GET(
   const { slug } = await params;
   const page = source.getPage(slug.slice(0, -1));
   if (!page) notFound();
-  const [interRegularData, interBoldData] = await Promise.all([
+  const [interRegularData, interBoldData, duckData] = await Promise.all([
     interRegular,
     interBold,
+    readImage('logo-duck.svg'),
   ]);
+  const duckSrc = `data:image/svg+xml;base64,${duckData.toString('base64')}`;
 
 
   if (!page) notFound();
@@ -35,16 +42,26 @@ export async function GET(
         style={{
           height: '100%',
           width: '100%',
+          position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          background: 'radial-gradient(circle at bottom left, #3b82f6, #1f2937)',
+          background: '#0f0f14',
           padding: '60px',
           color: 'white',
-          fontFamily: '"Inter"',
+          fontFamily: '"Instrument Sans"',
         }}
       >
+        <img
+          src={duckSrc}
+          style={{
+            position: 'absolute',
+            top: '30px',
+            right: '40px',
+            height: '120px',
+          }}
+        />
         <div
           style={{
             marginTop: '24px',
@@ -72,13 +89,13 @@ export async function GET(
       height: 300,
       fonts: [
         {
-          name: 'Inter',
+          name: 'Instrument Sans',
           data: interRegularData,
           weight: 400,
           style: 'normal',
         },
         {
-          name: 'Inter',
+          name: 'Instrument Sans',
           data: interBoldData,
           weight: 700,
           style: 'normal',
