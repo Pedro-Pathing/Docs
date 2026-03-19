@@ -1,3 +1,16 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/ocean.css';
+@import 'fumadocs-ui/css/black.css';
 @import 'fumadocs-ui/css/preset.css';
+
+@theme {
+    --color-fd-primary: #FE55A2;
+    --color-fd-primary-foreground: hsl(0, 0%, 98%);
+    --color-fd-ring: #FE55A2;
+}
+
+.dark {
+    --color-fd-background: #0f0f14;
+    --color-fd-primary: #FE55A2;
+    --color-fd-primary-foreground: hsl(0, 0%, 98%);
+    --color-fd-ring: #FE55A2;
+}

@@ -12,9 +12,7 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <>
-        <img className="size-10 dark:hidden" src={`${process.env.BASE_PATH}/logo-light.png`}
-          alt="Pedro Pathing Logo" />
-        <img className="size-10 hidden dark:inline" src={`${process.env.BASE_PATH}/logo.png`}
+        <img className="size-10" src={`${process.env.BASE_PATH}/logo-duck.svg`}
           alt="Pedro Pathing Logo" />
 
         <span>Pedro Pathing</span>

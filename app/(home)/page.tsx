@@ -32,7 +32,9 @@ follower.followPath(path);`;
   return (
     <main className="py-8 xl:pb-0 flex justify-center">
       <div className="w-300 mx-5 xl:mx-0 max-w-300 flex flex-col items-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 xl:mb-16">Pedro Pathing</h1>
+        <img className="mb-0 h-40 md:h-52 dark:hidden" src={`${process.env.BASE_PATH}/logo-stacked-dark.svg`} alt="Pedro Pathing" />
+        <img className="mb-0 h-40 md:h-52 hidden dark:block" src={`${process.env.BASE_PATH}/logo-stacked-light.svg`} alt="Pedro Pathing" />
+        <Link href="/docs/pathing/branding" className="mb-8 text-sm text-fd-muted-foreground hover:text-fd-primary transition-colors underline">New logo?</Link>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
             <span className="text-lg">Autonomous pathing made easy...</span>
@@ -55,15 +57,15 @@ follower.followPath(path);`;
         </div>
         <div className="flex flex-col md:flex-row xl:gap-4">
           <Link href="/docs/pathing"
-            className="flex mt-5 xl:mt-10 mb-2 items-center justify-center text-lg font-medium ring-offset-fd-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring bg-gradient-to-b from-fd-primary-foreground to-fd-primary-foreground/60 text-fd-primary shadow-fd-background/20 hover:bg-fd-primary-foreground/90 border-fd-primary border hover:opacity-80 h-13 px-7 rounded-full">
+            className="flex mt-5 xl:mt-10 mb-8 items-center justify-center text-lg font-medium ring-offset-fd-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring bg-fd-primary text-fd-primary-foreground hover:opacity-80 h-13 px-7 rounded-full">
             Get Started with Pedro Pathing
           </Link>
           {/*                    <Link href="/docs/panels"
-                          className="flex mt-5 xl:mt-10 mb-2 items-center justify-center text-lg font-medium ring-offset-fd-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring bg-gradient-to-b from-fd-primary-foreground to-fd-primary-foreground/60 text-fd-primary shadow-fd-background/20 hover:bg-fd-primary-foreground/90 border-fd-primary border hover:opacity-80 h-13 px-7 rounded-full">
+                          className="flex mt-5 xl:mt-10 mb-8 items-center justify-center text-lg font-medium ring-offset-fd-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring bg-gradient-to-b from-fd-primary-foreground to-fd-primary-foreground/60 text-fd-primary shadow-fd-background/20 hover:bg-fd-primary-foreground/90 border-fd-primary border hover:opacity-80 h-13 px-7 rounded-full">
                         Panels
                     </Link> */}
           <a href="https://github.com/Pedro-Pathing/PedroPathing" target="_blank" rel="noreferrer"
-            className="flex gap-2 mt-5 xl:mt-10 mb-2 items-center justify-center text-lg font-medium shadow-fd-background/20 h-13 px-7 rounded-full hover:bg-fd-card transition-colors duration-150">
+            className="flex gap-2 mt-5 xl:mt-10 mb-8 items-center justify-center text-lg font-medium shadow-fd-background/20 h-13 px-7 rounded-full hover:bg-fd-card transition-colors duration-150">
             <svg className="size-6" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <title>GitHub</title>
               <path fill="currentColor"

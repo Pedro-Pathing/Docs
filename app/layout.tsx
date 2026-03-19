@@ -1,13 +1,13 @@
 import './global.css';
 import {RootProvider} from 'fumadocs-ui/provider';
-import {Inter} from 'next/font/google';
+import {Instrument_Sans} from 'next/font/google';
 import type {ReactNode} from 'react';
 import {Banner} from "fumadocs-ui/components/banner";
 import Link from "next/link";
 import {Provider} from "@/app/provider";
 import 'katex/dist/katex.css';
 
-const inter = Inter({
+const instrumentSans = Instrument_Sans({
     subsets: ['latin'],
 });
 
@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function Layout({children}: { children: ReactNode }) {
     return (
-        <html lang="en" className={inter.className} suppressHydrationWarning>
+        <html lang="en" className={instrumentSans.className} suppressHydrationWarning>
         <body className="flex flex-col min-h-screen">
             <Provider>{children}</Provider>
         </body>
