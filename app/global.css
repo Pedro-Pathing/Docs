@@ -14,3 +14,20 @@
     --color-fd-primary-foreground: hsl(0, 0%, 98%);
     --color-fd-ring: #FE55A2;
 }
+
+.dark body {
+    background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(254, 85, 162, 0.08), transparent),
+        radial-gradient(ellipse 40% 30% at 80% 50%, rgba(254, 85, 162, 0.04), transparent),
+        radial-gradient(ellipse 40% 30% at 10% 60%, rgba(254, 85, 162, 0.03), transparent);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+body {
+    background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(254, 85, 162, 0.06), transparent),
+        radial-gradient(ellipse 40% 30% at 80% 50%, rgba(254, 85, 162, 0.03), transparent);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}

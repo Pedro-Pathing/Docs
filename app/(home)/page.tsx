@@ -22,11 +22,21 @@ export const metadata: Metadata = {
 export default function HomePage() {
 
   const code = `path = follower.pathBuilder()
-    .addPath(new BezierLine(scorePose, pickup1Pose))
-    .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-    .addPath(new BezierLine(pickup1Pose, scorePose))
-    .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-    .build();
+  .addPath(
+    new BezierLine(scorePose, pickupPose)
+  )
+  .setLinearHeadingInterpolation(
+    scorePose.getHeading(),
+    pickupPose.getHeading()
+  )
+  .addPath(
+    new BezierLine(pickupPose, scorePose)
+  )
+  .setLinearHeadingInterpolation(
+    pickupPose.getHeading(),
+    scorePose.getHeading()
+  )
+  .build();
 
 follower.followPath(path);`;
 
@@ -40,7 +50,7 @@ follower.followPath(path);`;
         </div>
 
         {/* Pitch + code side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start overflow-hidden">
           <div>
             <TypedHeading />
             <p className="mt-4 text-fd-muted-foreground leading-relaxed">

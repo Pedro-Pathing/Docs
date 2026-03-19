@@ -5,7 +5,8 @@ import TypeIt from "typeit-react";
 export default function TypedHeading() {
   return (
     <h2 className="text-3xl font-bold tracking-tight">
-      Autonomous pathing,{" "}
+      Autonomous pathing,
+      <br />
       <TypeIt
         options={{
           speed: 80,
