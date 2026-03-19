@@ -14,13 +14,14 @@
     "fumadocs-core": "15.5.1",
     "fumadocs-mdx": "11.6.7",
     "fumadocs-ui": "15.5.1",
+    "i18n": "^0.15.1",
     "katex": "^0.16.22",
     "next": "15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
-    "i18n": "^0.15.1"
+    "typeit-react": "^2.7.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
@@ -33,6 +34,6 @@
     "typescript": "^5.8.3"
   },
   "engines": {
-  "node": ">=22 <25"
+    "node": ">=22 <25"
   }
 }
