@@ -1,11 +1,12 @@
 {
   "pages": [
     "setup",
-    "localization",
-    "automatic",
-    "pids",
-    "tests",
     "swerve",
+    "localization",
+    "velocity",
+    "pids",
+    "predictive",
+    "tests",
     "troubleshooting"
   ]
 }
