@@ -2,6 +2,43 @@
 @import 'fumadocs-ui/css/black.css';
 @import 'fumadocs-ui/css/preset.css';
 
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(254, 85, 162, 0.25);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(254, 85, 162, 0.55);
+    background-clip: content-box;
+    border: 3px solid transparent;
+}
+
+* {
+    scrollbar-color: rgba(254, 85, 162, 0.35) transparent;
+    scrollbar-width: thin;
+}
+
 @theme {
     --color-fd-primary: #FE55A2;
     --color-fd-primary-foreground: hsl(0, 0%, 98%);
@@ -31,4 +68,45 @@ body {
         radial-gradient(ellipse 40% 30% at 80% 50%, rgba(254, 85, 162, 0.03), transparent);
     background-repeat: no-repeat;
     background-attachment: fixed;
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-up {
+    animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-up {
+        animation: none;
+    }
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #FE55A2 0%, #ff8fc4 50%, #FE55A2 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gradient-text {
+        animation: none;
+    }
 }
