@@ -55,6 +55,12 @@ and/or `.angleUnit()`. The defaults are inches and radians, respectively.
   average the results, as it results in more accurate localization.
 </Callout>
 
+The value of the `.offset()` should be a `SparkFunOTOS.Pose2D()`.
+
+```java title="Constants.java"
+.offset(new SparkFunOTOS.Pose2D(-3.75, 0.125, -1.5708))
+```
+
 ## Linear Scalar
 
 We will now adjust multipliers that convert encoder ticks into real-world
