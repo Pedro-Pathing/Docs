@@ -2,11 +2,93 @@
 title: Bezier Curves
 ---
 
-Bézier curves are the main paths that Pedro Pathing follows. A consequence of the Weierstrass Approximation Theorem states that given any target precision, for any continuous curve on the interval $$[0,1],$$ there exists a Bézier curve that approximates this curve to the target precision.
+Bézier curves are parametric curves defined by a set of control points. They are used to create smooth curved paths between positions.
 
-It is typically undesirable to create any Bézier curves with 3 or more control points (excluding the start and end points), as Pedro may have difficulty following the curve in such cases. This may lead to unexpected behavior. Note that inputting the same control point more than once or putting several collinear points in the incorrect order (i.e. like the points (10, 10), (0, 0), (20, 20)) may cause degeneracies in a path. Degenerate paths cannot be followed well by Pedro Pathing.
+The first and last control points define the start and end of the curve, while the points between them determine the shape of the curve.
+
+### Control Points
+
+When using `Paths.curve()`, the first and last Poses are the start and end of the curve. Any Poses between them are control points.
+
+```java
+PoseFactory p = PoseFactory.degrees();
+
+Pose start = p.of(0, 0, 0);
+Pose control = p.of(20, 30, 0);
+Pose end = p.of(40, 0, 0);
+
+Path curve = Paths.curve(start, control, end);
+```
+
+The curve is pulled toward `control`, but it does not have to pass directly through it.
+
+Multiple control points can also be used:
+
+```java
+Pose control1 = p.of(20, 30, 0);
+Pose control2 = p.of(40, 30, 0);
+
+Path curve = Paths.curve(
+    start,
+    control1,
+    control2,
+    end
+);
+```
+
+### Curves Through Points
+
+`Paths.through()` generates a Bézier curve that passes through the provided Poses.
+
+```java
+PoseFactory p = PoseFactory.degrees();
+
+Pose start = p.of(0, 0, 0);
+Pose middle = p.of(20, 30, 0);
+Pose end = p.of(40, 0, 0);
+
+Path curve = Paths.through(start, middle, end);
+```
+
+This is different from using the same points with `Paths.curve()`:
+
+```java
+Path curve = Paths.curve(start, middle, end);
+```
+
+With `Paths.curve()`, `middle` is a control point and the curve is not required to pass through it. With `Paths.through()`, the generated curve passes through `middle`.
+
+<Callout title="Tip" type="info">
+    Use `Paths.curve()` when you want to define the shape of the curve using control points. Use `Paths.through()` when you want the curve to pass through specific positions.
+</Callout>
 
 ### Parameterization
-By mathematical convention, Bézier curves aren't arc-length parameterized, a convention that Pedro follows for simplicity. This means that calling `getPose(0.5)` won't give you the `Pose` that is 50% along the path by distance. Bézier curves are instead parameterized using what we call a t-value, such that `t=0` gives the start of the path and `t=1` gives the end of the path.
-Pedro Pathing offers a conversion between t-value and path completion, using the following `BezierCurve` methods: `getPathCompletion(double t)` which outputs a percentage of the distance the robot has traveled, along with `getT(double pathCompletion)` which gives the opposite conversion. The `Path` class also offers the `getDistanceTraveled(double t)` and `getDistanceRemaining(double t)` methods, which can be called without parameters to use the robot's `closestPointTValue.`
-Pedro Pathing uses t-value for almost everything, but there a few notable exceptions: global `PathChain` heading interpolation uses path percentage completion instead for linear, custom, and piecewise interpolations, although the regular heading interpolation uses t-value. Furthermore, `ParametricCallbacks` actually use path percentage completion instead of t-value since this aligns more with our general intuition about where an action should be performed along a path.
+
+Bézier curves are parameterized using a t-value from `0` to `1`.
+
+* `t = 0` represents the start of the curve.
+* `t = 1` represents the end of the curve.
+* Values between `0` and `1` represent points along the curve.
+
+When working directly with a `BezierCurve`, `get(double t)` returns the point on the curve at the given t-value:
+
+```java
+BezierCurve curve = new BezierCurve(start, control, end);
+
+Vector2D point = curve.get(0.5);
+```
+
+Bézier curves are not parameterized by distance. This means that a t-value of `0.5` does not necessarily represent a point that is 50% of the total distance along the curve.
+
+A conversion between t-value and path completion is available using the following methods:
+
+* `getPathCompletion(double t)`: Returns the path completion at a given t-value.
+* `getT(double pathCompletion)`: Returns the t-value for a given path completion.
+
+```java
+double completion = curve.getPathCompletion(0.5);
+
+double t = curve.getT(completion);
+```
+
+Path completion is based on the distance traveled along the curve, while the t-value represents the curve's parameterization.

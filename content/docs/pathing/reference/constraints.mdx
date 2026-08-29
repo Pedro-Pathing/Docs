@@ -4,39 +4,113 @@ title: Constraints
 
 import { Callout } from 'fumadocs-ui/components/callout'
 
-Constraints are used to determine when a path is considered complete. 
+Constraints determine when a path reaches its end and when the follower has finished correcting to the final Pose.
 
-There are **five** criteria that all must be met for follower.isBusy() to become false.
+The completion constraints are configured in `ForesightConfig`.
 
-### Timeout
-Sets how long, **in milliseconds,** the follower has to correct after stopping, and after this time delay is complete, this criteria to be considered complete.
-Increasing it will give the robot more time to correct at the end of the path to improve its accuracy. Decreasing it will reduce the robot's wait time between following paths, but may cause the path following to be slightly more inaccurate. 
+### Parametric T
 
-To set: `path.setTimeoutConstraint(double set)` 
-	
-### TValue
-Sets the path's parametric end criteria, or how much of the path the robot must follow before it is considered complete. `set` should be a double between 0.0 and 1.0.
+`parametricTConstraint` determines how close the closest t-value must be to `1` before the path reaches its parametric end.
 
-To set: `path.setTValueConstraint(double set)`
+The default value is `0.025`, meaning the closest t-value must reach at least `0.975`.
+
+```java
+c.parametricTConstraint.set(0.025);
+```
+
+Increasing this value allows the path to reach its parametric end earlier, while decreasing it requires the robot to get closer to `t = 1`.
 
 ### Velocity
-Sets the velocity that the robot must be below allowed for this criteria to be considered complete. This is in inches/second. 
 
-To set: `path.setVelocityConstraint(double set)`
+`velocityConstraint` sets the tangential speed the robot must be below while correcting at the end of the path.
+
+The default value is `0.1`.
+
+```java
+c.velocityConstraint.set(0.1);
+```
+
+A lower value requires the robot to slow down more before the velocity constraint is met.
 
 ### Translational
-Sets the maximum amount of translational error allowed for this criteria to be considered complete.
-The error has to be under this value.
 
-To set: `path.setTranslationalConstraint(double set)`
+`translationalConstraint` sets the maximum allowed distance between the robot and the final target position.
+
+The default value is `0.1`.
+
+```java
+c.translationalConstraint.set(0.1);
+```
+
+The translational error must be below this value for the constraint to be met.
 
 ### Heading
-Sets the maximum amount of heading error allowed for this criteria to be considered complete.
-The error has to be under this value.
 
-To set: `path.setHeadingConstraint(double set)`
+`headingConstraint` sets the maximum allowed heading error between the robot and the final target heading.
+
+The value is in radians, and the default is `0.007`.
+
+```java
+c.headingConstraint.set(0.007);
+```
+
+`Math.toRadians()` can also be used when setting the value:
+
+```java
+c.headingConstraint.set(Math.toRadians(1));
+```
+
+The heading error must be below this value for the constraint to be met.
+
+### Timeout
+
+`timeoutConstraint` sets how long, in milliseconds, the follower is allowed to correct at the final Pose before it stops being considered busy.
+
+The default value is `100` milliseconds.
+
+```java
+c.timeoutConstraint.set(100.0);
+```
+
+Increasing the timeout gives the robot more time to correct at the endpoint. Decreasing it allows the follower to finish sooner if the other end constraints cannot be met.
+
+### Setting Constraints
+
+Constraints can be changed in `ForesightConfig` alongside the other follower constants:
+
+```java
+public static ForesightConfig foresightConfig = new ForesightConfig(
+    c -> {
+        c.parametricTConstraint.set(0.025);
+        c.velocityConstraint.set(0.1);
+        c.translationalConstraint.set(0.1);
+        c.headingConstraint.set(0.007);
+        c.timeoutConstraint.set(100.0);
+
+        // Other Foresight constants...
+    }
+);
+```
+
+Constraints can also be temporarily changed for a specific path using `with()`:
+
+```java
+Path path = Paths.curve(start, control, end)
+    .tangent()
+    .with(
+        foresightConfig.timeoutConstraint.at(250.0),
+        foresightConfig.translationalConstraint.at(0.25)
+    );
+```
+
+The modified values are applied while that path is active and are restored afterward.
+
+### Path Completion
+
+Once a path reaches its parametric end, the final endpoint is used as the target Pose.
+
+While correcting at the final Pose, `follower.isBusy()` becomes false when the velocity, translational, and heading constraints are all met, or when the timeout is reached.
 
 <Callout title="Tip" type="info">
-	If the robot gets stuck after reaching the end of the path and is unable to continue following the next one, the follower likely thinks that it is not done following the path. 
-	Try decreasing the T-Value and/or Timeout constraint for that path. 
+    If the follower takes too long to finish at the endpoint, check the final position, heading, and velocity errors before changing the constraints. Increasing `parametricTConstraint` reaches the parametric end earlier, while decreasing `timeoutConstraint` reduces how long the follower will continue correcting.
 </Callout>
