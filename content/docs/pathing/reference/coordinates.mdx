@@ -4,27 +4,17 @@ title: Coordinates
 
 Pedro Pathing uses a right-hand coordinate system, which is nonstandard to the FTC SDK Standard.
 
-<img
-  className="inline-block dark:hidden"
-  src="/docs/fieldcoordinates-light.png"
-  alt="Pedro Pathing FTC Coordinate System"
-/>
+As a robot moves to the right, x increases. As a robot moves up on the field, y increases.
 
-<img
-  className="hidden dark:inline-block"
-  src="/docs/fieldcoordinates-dark.png"
-  alt="Pedro Pathing FTC Coordinate System"
-/>
-
-As shown, as a robot moves to the right in the image above, x increases. As a robot moves up on the field image, y increases.
-
-A robot facing towards the right side of the image is at a heading of 0 radians (0 degrees), facing up is $\frac{\pi}{2}$ radians (90 degrees), facing left is $\pi$ radians (180 degrees), and facing down is $\frac{3\pi}{2}$ radians (270 degrees).
+A robot facing towards the right side of the field is at a heading of 0 radians (0 degrees), facing up is $\frac{\pi}{2}$ radians (90 degrees), facing left is $\pi$ radians (180 degrees), and facing down is $\frac{3\pi}{2}$ radians (270 degrees).
 
 Thus, counterclockwise rotation is positive rotation, similar to a unit circle.
 
-To convert coordinates from another coordinate system into Pedro's coordinates, rotate and translate the position to match Pedro's origin and axis directions.
+### Converting FTC Coordinates
 
-For example, if your coordinates use the center of the field as the origin and are rotated 90 degrees relative to Pedro's coordinate system, you can convert them like this:
+Pedro does not include a built-in coordinate conversion method. Coordinates from the FTC coordinate system can instead be rotated and translated directly when creating a `Pose`.
+
+For example, if you have a `Pose2D` named `ftcPose2d`, you can convert it to Pedro coordinates like this:
 
 ```java
 double x = ftcPose2d.getX(DistanceUnit.INCH);
@@ -38,6 +28,20 @@ Pose convertedPose = new Pose(
 );
 ```
 
-The rotation changes the direction of the axes, while the translation moves the origin to the bottom-left corner of the field.
+The x and y values are rotated to match Pedro's axis directions, then translated by `72` inches to move the origin from the center of the field to the bottom-left corner.
 
-If the coordinate system you are converting from uses a different origin or axis orientation, change the rotation and translation to match it.
+The heading is also rotated by $-\frac{\pi}{2}$ radians to match Pedro's heading convention.
+
+If the coordinate system you are converting from uses a different origin, axis orientation, or distance unit, adjust the rotation and translation accordingly.
+
+<img
+  className="inline-block dark:hidden"
+  src="/docs/fieldcoordinates-light.png"
+  alt="Pedro Pathing FTC Coordinate System"
+/>
+
+<img
+  className="hidden dark:inline-block"
+  src="/docs/fieldcoordinates-dark.png"
+  alt="Pedro Pathing FTC Coordinate System"
+/>
