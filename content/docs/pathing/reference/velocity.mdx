@@ -1,0 +1,68 @@
+---
+title: Types of Velocities
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+There are many different types of velocities that the `Follower` reports, and it may be confusing to tell them apart.
+
+This page walks through the different kinds of velocity types you can get from the Pedro Pathing API.
+
+### Scalar Tangential Velocity
+
+You can get your robot's tangential velocity along the curve with the following method:
+
+```java
+double tangentialVelocity = follower.tangentialVelocity();
+```
+
+Intuitively, this gives you the component of the robot's velocity that points along the curve.
+This is the velocity used to determine whether the `Follower` has finished following the path.
+
+### World-Frame Velocity
+
+You can get your robot's world-frame velocity with the following method:
+
+```java
+Velocity velocity = follower.velocity();
+```
+
+This returns an immutable object of type `Velocity`, which gives the robot's velocity in each axis of the absolute coordinate frame.
+For instance, the x-component of this velocity gives your robot's velocity in the x-axis, i.e. with the same coordinate system
+you used to define your poses and curves.
+
+To extract the velocity along each axis from this object, you can use the following methods:
+
+```java
+double xVelocity = fieldVelocity.vx;
+double yVelocity = fieldVelocity.vy;
+double omega = fieldVelocity.omega;
+```
+
+Here `omega` corresponds to the robot's angular velocity.
+
+### Body-Frame Twist
+
+You can get your robot's body-frame velocity (referred to as a "twist") with the following method:
+
+```java
+Twist twist = follower.twist();
+```
+
+This returns an immutable object of type `Twist`, which gives the robot's velocity in each axis of the robot's local frame.
+For instance, the x-component of this twist gives your robot's velocity in the forward direction, i.e. with the same coordinate system
+you used to define your odometry offsets. Reminder: positive x is forward, positive y is left for the robot
+
+To extract the velocity along each axis from this object, you can use the following methods:
+
+```java
+double forwardVelocity = twist.vx;
+double strafeVelocity = twist.vy;
+double omega = twist.omega;
+```
+
+Here `omega` corresponds to the robot's angular velocity.
+
+<Callout title="Tip" type="info">
+    The robot's angular velocity is invariant between the body-frame and world-frame. This means that `follower.twist().omega` returns the same value as `follower.velocity().omega`
+</Callout>

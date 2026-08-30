@@ -6,6 +6,7 @@
     "deceleration",
     "coordinates",
     "constraints",
-    "beziercurves"
+    "beziercurves",
+    "velocity"
   ]
 }
