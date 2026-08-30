@@ -7,21 +7,37 @@ Pedro Pathing uses a right-hand coordinate system, which is nonstandard to the F
 <img
   className="inline-block dark:hidden"
   src="/docs/fieldcoordinates-light.png"
-  alt="Pedro Pathing Decode FTC Coordinate System"
+  alt="Pedro Pathing FTC Coordinate System"
 />
 
 <img
   className="hidden dark:inline-block"
   src="/docs/fieldcoordinates-dark.png"
-  alt="Pedro Pathing Decode FTC Coordinate System"
+  alt="Pedro Pathing FTC Coordinate System"
 />
 
-As shown, as a robot moves to the right in the image below, x increases. As a robot moves up on the field image, y increases.  
+As shown, as a robot moves to the right in the image above, x increases. As a robot moves up on the field image, y increases.
 
 A robot facing towards the right side of the image is at a heading of 0 radians (0 degrees), facing up is $\frac{\pi}{2}$ radians (90 degrees), facing left is $\pi$ radians (180 degrees), and facing down is $\frac{3\pi}{2}$ radians (270 degrees).
+
 Thus, counterclockwise rotation is positive rotation, similar to a unit circle.
 
-To convert FTC Coordinates for the Decode game into Pedro's coordinates, first declare a Pose in FTC coordinates (inverted for decode). Let's say you have Pose2D (a class in the FTC SDK) `ftcPose2d` with your coordinates from a camera. You can use 
-`Pose ftcStandard = PoseConverter.pose2DToPose(ftcPose2d, InvertedFTCCoordinates.INSTANCE);` to convert this to Pedro's `Pose` class. Then, you need to convert to Pedro coordinates using 
-`ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);`
+To convert coordinates from another coordinate system into Pedro's coordinates, rotate and translate the position to match Pedro's origin and axis directions.
 
+For example, if your coordinates use the center of the field as the origin and are rotated 90 degrees relative to Pedro's coordinate system, you can convert them like this:
+
+```java
+double x = ftcPose2d.getX(DistanceUnit.INCH);
+double y = ftcPose2d.getY(DistanceUnit.INCH);
+double heading = ftcPose2d.getHeading(AngleUnit.RADIANS);
+
+Pose convertedPose = new Pose(
+    y + 72,
+    72 - x,
+    heading - Math.PI / 2
+);
+```
+
+The rotation changes the direction of the axes, while the translation moves the origin to the bottom-left corner of the field.
+
+If the coordinate system you are converting from uses a different origin or axis orientation, change the rotation and translation to match it.
