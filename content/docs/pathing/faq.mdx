@@ -1,14 +1,87 @@
 ---
-title: FAQ
+title: Troubleshooting
 description: Something went wrong?
 ---
 
 import {Accordions, Accordion} from "fumadocs-ui/components/accordion";
 
 If you have trouble during your tuning, this page may cover some common issues that are had, just click to expand the dropdown.
-Otherwise, join the [Pedro Pathing Discord](https://discord.gg/2GfC4qBP5s) and ask in #general or in the #tuning-help channels. When asking in #tuning-help, please provide additional infomation other than your issue. This could be a video, your constants, telemetry outputs, logcat, or any other infomation.
+Otherwise, join the [Pedro Pathing Discord](https://discord.gg/2GfC4qBP5s) and ask in #general or in the #tuning-help channels. When asking in #tuning-help, please provide additional infomation other than your issue. This could be a video, your constants, telemetry outputs, logcat, or any other information.
 
 <Accordions type="single">
-    <Accordion title="placeholder">
+    <Accordion title="Inaccurate Localization">
+    Check whether:
+        - The parallel & perpendicular odometry pods' names are swapped
+        - Encoder (odometry) directions are reversed
+        - Odometry pod offsets are inaccurate or switched
+        - (If using a Pinpoint Localizer) The Pinpoint is mounted incorrectly. The Pinpoint should be mounted sticker-side up.
+
     </Accordion>
+
+    <Accordion title="Robot Drifts during Line Test">
+       Check whether the localizer's estimated position drifts over time.
+
+       **If you're using a drive encoders, two wheel, three wheel, or OTOS,** a small amount of drift will happen over time, as these localizers aren't perfect.
+       However, the tolerance should remain manageable for the entire 30 second autonomous period.
+    </Accordion>
+
+    <Accordion title="Robot Moves Infinitely during a Tuning Program">
+            **Check if:**
+            - Your localization is inaccurate. Run `LocalizationTest` and check:
+                - when you move the robot forward, does the x-value increase?
+                - when you move the robot to the left, does the y-value increase?
+                - is the reported heading accurate?
+            If not, head over back to the localization section and double check your steps.
+            Ensure that your localization is fully accurate before running automatic tuners and tuning your PIDFs.
+            - Your motor directions are reversed.
+            - Your motor configurations are incorrect.
+    </Accordion>
+
+    <Accordion title="Robot Moves in Wrong Direction">
+                1. Run the LocalizationTest OpMode
+                2. Use gamepad1 joysticks to move around:
+                    - Left Stick Y: Forward and Backwards
+                    - Left Stick X: Strafe Left and Right
+                    - Right stick: Rotation
+                3. If the movement directions are wrong, then run the Motor Directions OpMode. There is a button to make the motors spin forward. If the motors spin backwards instead when pressing the button, then change the reversal.
+
+            For more information on how mecanum wheels move, refer to [this image](https://cdn11.bigcommerce.com/s-x56mtydx1w/images/stencil/original/products/2005/10985/3213-3606-0003-Product-Insight-4__96315__10052.1701994274.png?c=1) provided by goBILDA®.
+    </Accordion>
+
+    <Accordion title="Poorly Tuned Foresight Values">
+                First, ensure that your robot has a sufficiently high battery and try re-running the automatic tuners multiple times, taking an average of all the values each test gave you across multiple trials.
+
+                In the unlikely event that the values given by the auto tuners are incorrect even after multiple runs, feel free to manually adjust the constants based on the robot's behavior!
+
+                First, try to identify what part of the robot's behavior is not ideal: is it the heading correction, strafe (sideways) correction, or forward correction? This will help you determine which controllers (heading, translationalLateral, translationalForward) to change.
+                	- If the robot often overshoots or its movements are too jittery, then it may be correcting too aggressively. In that case, lower the P value of the controller you wish to modify.
+                	- If the robot does not seem to correct quickly or strongly enough, then increase the P value of the controller.
+
+                <Callout title="Large and Small Controllers" type="info">
+                  For each kind of correction, you can choose to create 2 controllers: one large and one small.
+                  The large controller handles corrections from larger errors, while the small controller handles corrections from smaller errors. As a result, you can tune the large controller to correct more aggressively than the small controller. This enables the robot to correct quickly from larger errors while minimizing overshoot when correcting from smaller errors.
+
+                  For example, in the ForesightConfig method, you create two different translationalForward controllers by typing
+                  ```java title="Constants.java"
+                  Controller largeTranslationalForward = Controller.proportional(.3);
+                  Controller smallTranslationalForward = Controller.proportional(.1);
+                  ```
+                  and combine them into a single piecewise controller with
+                  ```java title="Constants.java"
+                  c.forwardTranslational.set(Controller.piecewise(smallTranslationalForward).put(threshold, largeTranslationalForward));
+                  ```
+                  where `smallTranslationalForward` is used when the error is less than `threshold` and `largeTranslationalForward` is used when the error is greater than `threshold`.
+                </Callout>
+
+                <Callout title="Feedforward" type="info">
+                  The static feedforward sends a small amount of power to the drivetrain motors to compensate for the friction with the motors, wheels, and ground.
+                  To add a feedforward to a controller, add
+                  ```java title="Constants.java"
+                       .plus(Controller.staticFeedforward(0.0115))
+                  ```
+                  to the controller you want to modify.
+                  If the static feedforward is set too high, this may cause the motors to be given too much power, causing the robot to overshoot or jitter.
+                </Callout>
+    </Accordion>
+
 </Accordions>
