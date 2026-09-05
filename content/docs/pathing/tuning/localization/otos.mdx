@@ -1,126 +1,107 @@
 ---
 title: OTOS
-description: A localizer that uses the SparkFun Optical Tracking Odometry Sensor
+description: A localizer that uses the SparkFun Optical Tracking Odometry Sensor (OTOS).
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout'
-
-<Callout title="Prerequisites" type="info">
-  Ensure that the OTOS is properly mounted and connected, and the yellow kapton
-  tape has been pulled off the sensor. The OTOS
-  should be connected to a REV Hub through an I2C cable (not to port 0 because
-  the IMU is there).
+<Callout title="Common Mistakes" type="warning">
+    * Make sure the OTOS is plugged into an I2C port **other than port 0**. This is because the Control Hub's built in IMU uses port 0.
 </Callout>
 
-## Setup
+## Automatic Tuning
 
-In `Constants.java`, add an instance of `OTOSConfig`. Make sure to
-replace the name with the actual name.
+The OTOS AutoTuner can automatically determine your OTOSConfig, which includes the name, offsets, and scalars.
 
-```java title="Constants.java"
-public static OTOSConfig localizerConfig = new OTOSConfig(
-  c -> {
-    c.name.set("otos")
-    c.linearUnit(DistanceUnit.INCH)
-    c.offset.set(new Pose(3, 5));
-    c.linearScalar.set(0.5);
-    c.angularScalar.set(0.3)
-  }
-);
+### Add the Tuner
+
+Inside your `Tuning` class, add:
+
+```java title="Tuning.java"
+@Tuner
+public static Procedure otosTuner() {
+    return new OTOSTuner();
+}
 ```
 
-Then, add `new OTOSLocalizer` to `create`:
+Build and send the updated code to your Robot.
 
-```java title="Constants.java"
-return new Follower(
-    new OTOSLocalizer(h, localizerConfig),
-    // Drivetrain Config
-    // Foresight Config
-    );
+### Open AutoTune
+
+While connected to the Robot Controller, open the following address in your browser: https://192.168.43.1:10158
+
+Select **OTOS Procedure**.
+
+### OTOS Setup
+
+First, enter the **HardwareMap name** of your OTOS.
+
+For example, if your OTOS is named `otos` in your Configuration on your Driver Hub, enter:
+
+```text
+otos
 ```
+in the **HardwareMap Name** field. Then press **Submit**.
 
-## Offsets
+### Scalar Tuner Setup
+In the two following steps, you will first tune your OTOS's linear scalar and then its angular scalar.
+To set this up, first enter the distance (inches) you will push your robot and the number of times you will turn the robot.
 
-You must specify the sensor's position relative to the center of the robot.
-Measure the X and Y coordinates, and then change the value of `.offset()`.
-If you would like to change the units used, you can change `.linearUnit()`
-and/or `.angleUnit()`. The defaults are inches and radians, respectively.
-
-<Callout title="Important" type="warning">
-  The y axis is the left/right axis, and the x axis is the forward/backward
-  axis.
-
-  Left is positive y and forward is positive x.
-
-  Facing forward is `PI/2` radians or `90` degrees, and clockwise rotation
-  is negative.
-</Callout>
+The default values are recommended: pushing the robot 48 inches and turning it 10 times.
 
 <Callout title="Tip" type="info">
-  It is recommended that you run the following tests multiple times and
-  average the results, as it results in more accurate localization.
+    For the next two steps, we recommend lining the robot up against reference lines on the field to ensure you aren't off by a couple inches degrees due to human error in your pushing or turning.
 </Callout>
 
-## Linear Scalar
+### Linear Scalar Identification
+Start the test, and push your robot exactly the number of inches you specified. Then stop the OpMode.
 
-We will now adjust multipliers that convert encoder ticks into real-world
-measurements: inches. This ensures your localizer's readings are accurate.
+### Angular Scalar Identification
+Start the test, and turn your robot exactly the number of times you specified. Then stop the OpMode.
 
-Since the OTOS has only one linear scalar, you can run either the forward or
-lateral tuner, as they should result in very similar values.
+### Offsets Identification
 
-### Option 1: Forward Tuner
+Press **Continue**, then rotate the robot in place approximately **180 degrees**.
 
-In the tuning OpMode, under localization, select and start the forward tuner.
-Then, push the robot **forward 48 inches** (exactly 2 field tiles). This
-distance is configurable if needed. Once you push the robot forward, two
-numbers will be displayed on telemetry:
+After the robot has completed the rotation, stop the OpMode.
 
-- The distance the robot thinks it has traveled
-- The linear scalar; this is the number you want.
+The tuner will automatically calculate the x and y pod offsets.
 
-Add the linear scalar to your `OTOSConfig` by doing the following.
+### Applying the Results
 
-```java title="Constants.java"
-.linearScalar(multiplier)
-```
+Once the tuner is complete, open the **Java** tab.
 
-### Option 2: Lateral Tuner
+AutoTune will generate an `OTOSConfig` using the values determined during the tuning procedure.
 
-In the tuning OpMode, under localization, select and start the lateral tuner.
-Then, push the robot **left 48 inches** (exactly 2 field tiles). This
-distance is configurable if needed. Once you push the robot forward, two
-numbers will be displayed on telemetry:
+Copy the generated configuration into the `OTOSConfig` in your `Constants.java` file.
 
-- The distance the robot thinks it has traveled
-- The linear scalar; this is the number you want.
+The generated configuration includes:
 
-Add the linear scalar to your `OTOSConfig` (or modify the value in the quickstart)
-by doing the following.
+- HardwareMap name
+- Angular Scalar
+- Linear Scalar
+- X offset
+- Y offset
 
-```java title="Constants.java"
-.linearScalar(multiplier)
-```
+### Manual Offset Tuning
 
-## Turn Tuner
+Offsets can also be found manually using the diagram below. Offsets are in inches.
 
-The turn tuner is similar to both the forward tuner and lateral tuner, except it is
-rotational. Place the robot so it aligns to a fixed reference point
-(e.g., edge of a field tile).
-In the tuning OpMode, under localization, select and start the turn tuner.
-Rotate the robot **counterclockwise one full rotation**.
+Set your odometry pod offsets to define where they are relative to your robot's center of rotation.
 
-Add the angular scalar to your `OTOSConfig` by doing the following.
+<img
+    className="inline-block dark:hidden"
+    src="/docs/odometry-light.png"
+    alt="Odometry Pod Offset Diagram"
+/>
 
-```java title="Constants.java"
-.angularScalar(multiplier)
-```
+<img
+    className="hidden dark:inline-block"
+    src="/docs/odometry-dark.png"
+    alt="Odometry Pod Offset Diagram"
+/>
 
-## Testing the localizer
+## Testing the Localizer
 
-Once you have completed the tuning steps, you can test your localizer as
-described
-[on the localization page](/docs/pathing/tuning/localization#localization-test).
+Once you have completed the tuning steps, you can test your localizer as described [on the localization page](/docs/pathing/tuning/localization#localization-test).
 
 Congratulations on successfully tuning your localizer!
 
