@@ -4,9 +4,7 @@ title: Constraints
 
 import { Callout } from 'fumadocs-ui/components/callout'
 
-Constraints control when a path reaches its parametric end and when correction at the final Pose is considered settled.
-
-The completion constraints are configured in `ForesightConfig`.
+**Constraints** and **tuning parameters** control two related things: when a path segment (and the overall path) is considered **finished** or settled, and how the `follower` balances **heading, position, and speed** corrections while actively driving. All of these are configured in `ForesightConfig`.
 
 ### Parametric T
 
@@ -74,6 +72,51 @@ c.timeoutConstraint.set(100.0);
 
 Increasing the timeout gives the robot more time to correct at the endpoint. Decreasing it allows the follower to finish sooner if the other endpoint constraints cannot be met.
 
+### Heading Drive Ratio
+
+`headingDriveRatio` controls how much priority is given to heading correction compared to forward movement. Higher values give heading correction more priority, while lower values allow more forward movement before heading correction takes priority.
+
+The default value is  `0.5`.
+
+```java
+c.headingDriveRatio.set(0.5);
+```
+
+### Path Continuation
+
+`brakeAtEnd` determines whether the robot should start braking before getting to the end of the path or keep coasting.
+This only affects the final location, the rest of the paths continue normally.
+
+The default value is `true`.
+
+```java
+c.brakeAtEnd.set(true);
+```
+
+### Deviation Tolerances
+
+`translationalDeviationTolerance` and `headingDeviationTolerance` determine whether the robot's position and heading are still on track. If either error exceeds its tolerance, the follower prioritizes correcting the error instead of continuing normally along the path.
+
+The default value for `translationalDeviationTolerance` is `2.5`, And for  `headingDeviationTolerance` is `11.25` degrees.
+
+```java
+c.translationalDeviationTolerance.set(2.5);
+
+c.headingDeviationTolerance.set(Math.toRadians(11.25));
+```
+
+### Cosine scaling
+
+`cosineScale` reduces the robot's forward speed when its position or heading error gets too large.
+
+Once the error passes twice the deviation tolerance, forward speed drops to zero, giving the correction controllers full use of the remaining power. It doesn't make the correction stronger; it just reduces the competition from forward movement. Below the tolerance, forward speed stays unchanged.
+
+The default value is `false`.
+
+```java
+c.cosineScale.set(true);
+```
+
 ### Setting Constraints
 
 Constraints can be changed in `ForesightConfig` alongside the other follower constants:
@@ -86,6 +129,13 @@ public static ForesightConfig foresightConfig = new ForesightConfig(
         c.translationalConstraint.set(0.1);
         c.headingConstraint.set(0.007);
         c.timeoutConstraint.set(100.0);
+
+        c.headingDriveRatio.set(0.5);
+        c.brakeAtEnd.set(true);
+        c.translationalDeviationTolerance.set(2.5);
+        c.headingDeviationTolerance.set(Math.toRadians(11.25));
+        c.cosineScale.set(true);
+
 
         // Other Foresight constants...
     }
