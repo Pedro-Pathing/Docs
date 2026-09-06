@@ -1,0 +1,43 @@
+---
+title: Following States
+description: How to know what the `Follower` is doing
+---
+
+In this guide, we will discuss how to know what Pedro is doing and when it has finished doing something.
+
+## Follower Mode
+
+The `Follower` has four possible modes at any given time: FOLLOW, HOLD, MANUAL, and IDLE.
+You can get the current mode with `follower.mode()`.
+
+The FOLLOW mode means the `Follower` is following a path autonomously.
+When the path is completed, the Follower automatically switches to mode HOLD to hold a pose, or IDLE if holdEnd is set to false.
+
+The IDLE mode means the `Follower` is not currently sending commands to the drive motors,
+while the MANUAL mode means the `Follower` is set to TeleOp driving.
+
+### Path Termination
+It is important to know when the `Follower` has finished following the path because this tells you when to follow the next one.
+
+The command `!follower.isBusy()` tells you if the `Follower` has finished following the path and has stopped at the target.
+
+If you only care about the `Follower` finishing the path, and not having stopped completely or having a small amount of translational/heading deviation from the target,
+you should use 'follower.atParametricEnd()' instead of `!follower.isBusy()`.
+
+<Callout title="Tip" type="info">
+    You can optimize your auto using more lenient conditions for this. I personally like using
+    `Math.abs(follower.tangentialVelocity()) &lt; Constants.foresightConfig.velocityConstraint.get() && follower.distanceToEndpoint() &lt; 4` which seems to work well.
+</Callout>
+
+### Follower States
+The `Follower` exposes several methods that allow you to monitor the robot's following state. Here are a few:
+
+- `follower.completion()` gives you, from 0 to 1, the percentage of the current path segment the robot has completed.
+- `follower.remainingDistance()` gives you the distance remaining along the path for the robot to travel.
+- `follower.distanceToEndpoint()` gives you the Cartesian distance from the robot to the endpoint of the path.
+- `follower.closestPose()` gives you the closest pose on the path to the robot.
+- `follower.pathIndex()` gives you the index of the current segment of the path you are following. For instance, if you've chained 3 paths together, it may tell you that you're following the second one.
+- `follower.currentCurve()` gives you the `Curve` object your robot is currently following
+- `follower.currentPath()` gives you the `Path` object your robot is currently following
+
+There are several more, but experience using Pedro Pathing will make it easier to know which one you need.

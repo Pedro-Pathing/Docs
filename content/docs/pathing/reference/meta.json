@@ -7,6 +7,7 @@
     "coordinates",
     "constraints",
     "beziercurves",
-    "velocity"
+    "velocity",
+    "follow-state"
   ]
 }
