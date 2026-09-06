@@ -1,0 +1,39 @@
+---
+title: Debug Strings
+description: How to print Pedro's states
+---
+
+Almost every important component of Pedro Pathing's follower has a debug string that can be logged.
+
+The Drivetrain, Algorithm, and Localizer all have their own `debugString()` methods that return a `String` log of their present state.
+
+If you are requesting Pedro Pathing troubleshooting help from others, sending a video of these messages can provide an effective way for others to diagnose your issue.
+
+## Accessing Debug Strings
+You may access these debug strings with the following methods:
+
+```java
+String drivetrainString = follower.drivetrain.debugString();
+String algorithmString = follower.algorithm().debugString();
+String localizerString = follower.localizer.debugString();
+```
+
+Then, if someone asks you to send a video of your "drivetrain string", you would do that like this:
+
+```java
+String drivetrainString = follower.drivetrain.debugString();
+telemetry.addLine(drivetrainString);
+telemetry.update();
+```
+
+### Follower String
+The `Follower` also has its own debug string that combines the strings from the Drivetrain, Algorithm, and Localizer with a small amount of additional data.
+
+You may access the follower string with the `follower.debugString()` method.
+
+<Callout title="Tip" type="info">
+    Alternatively, if you call `follower.withLogger(telemetry::addData)` once in `start` or `init`, the `Follower` will automatically print its debug string to telemetry.
+    You will still need to call `telemetry.update()` yourself. See [Logging](/docs/pathing/reference/logging) for more details.
+</Callout>
+
+

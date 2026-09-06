@@ -1,0 +1,33 @@
+---
+title: Logging
+description: How to log Pedro's states
+---
+
+Make sure you've read and understood [Debug Strings](/docs/pathing/guide/debug-string) before reading this page.
+
+Pedro Pathing has built-in integration with logging software. Here's how to use it:
+
+## String Logging
+You can add software to the Follower that automatically logs the follower string during each `follower.update()`. A string logger must be of the form `BiConsumer<String, String`, meaning that it must have a way to consume both a key and a value.
+
+You may add as many loggers as you like to the follower, as it stores them in a collection. Here is an example:
+
+```java
+Follower follower = Constants.create(hardwareMap)
+                        .withLogger(telemetry::addData)
+                        .withLogger((key, value) -> customLogger.log("I love Pedro", value));
+```
+
+Note that this second logger in the example discards the provided key. You may use your own key if you like, but Pedro Pathing's default key is
+`Pedro Pathing Log`. Use this key to search your log if you are using the default one.
+
+<Callout title="Common Mistake" type="warning">
+    The `Follower` will NOT update your logger for you. For example, will still need to call `telemetry.update()` yourself each loop.
+</Callout>
+
+### Data Logging
+If you are using the Foresight algorithm, you can also integrate a numeric data logger into the algorithm.
+
+The method `foresight.debugData()` returns a `ForesightDebugData` object, which contains graphable numeric data about the robot's state: pose, velocity, twist, heading and translational error, remaining distance on the path, and more.
+To access this data, you may use the following code:
+
