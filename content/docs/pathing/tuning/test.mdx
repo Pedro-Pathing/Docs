@@ -2,3 +2,52 @@
 title: Test
 description: Test a fully tuned Follower
 ---
+
+## Tuning Verification
+
+The Tests Procedure can be used to verify that your Follower is tuned well and working correctly.
+
+### Add the Tests Procedure
+
+Inside your `Tuning` class, add:
+
+```java title="Tuning.java"
+@Tuner
+public static Procedure tests() {
+    return new Tests(Constants::create);
+}
+```
+
+Verify that you have the create method set up correctly, then build/send the updated code to your Robot.
+
+### Open AutoTune
+
+While connected to the Robot Controller, open the following address in your browser: http://192.168.43.1:10158
+
+Select **Tests Procedure**.
+
+### Hold Test
+
+This will hold the robot in place.
+
+This is useful for testing the corrective behavior of the Foresight algorithm when the robot is pushed off course.
+
+### Line Test
+
+This will drive the robot forward and back in straight line **distance** inches away.
+
+The default is 48 inches.
+
+It will continually drive back and forth until you stop it.
+
+### Curved Test
+
+This will drive the robot in a curved path: a quarter circle with tangential heading.
+
+It will loop driving the robot to an endpoint of (**distance**, **distance**), which is to the front and left of the start point, then back to the start.
+
+The default distance is 48 inches.
+
+### Interpolation Test
+
+This follows the same path as the Curved Test, but it will use various interpolations.
