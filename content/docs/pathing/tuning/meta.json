@@ -3,6 +3,7 @@
     "drivetrain",
     "localization",
     "foresight",
+    "constants",
     "test"
   ]
 }
