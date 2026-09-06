@@ -1,0 +1,116 @@
+---
+title: Controllers
+---
+Controllers take in a `target` and an `error` and use those to calculate an output that helps determine what powers the motors should be given to correct that error. This page will give an overview of the different kinds of controllers you can use.
+
+### Proportional Controllers
+To create a Proportional controller called `controller1`, type
+```java
+Controller controller1 = Controller.proportional(double kP);
+```
+The controller returns the error it receives scaled by a factor of `kP`.
+The `headingFeedback`, `forwardTranslational`, and `strafeTranslational` controllers in `ForesightConfig` are typically set to be proportional controllers.
+
+### PID Controllers
+To create a PID controller called `controller1`, type
+```java
+Controller controller1 = Controller.pid(double kP, double kI, double kD);
+```
+Given the input `error`, `controller1` will:
+    - scale `error` by a factor of `kP` (the Proportional term)
+    - calculate the sum of all `error`s over time (the Integral term)
+    - calculate the rate of change of the `error` (the Derivative term)
+and return the sum of the Proportional, Integral, and Derivative terms.
+
+<Callout title="Note" type="info">
+  PID controllers are usually not needed in Pedro Version 3.0; Proportional Controllers are typically used instead.
+</Callout>
+
+### Piecewise Controllers
+Piecewise controllers allow you to "combine" multiple controllers into one, where each controller has a specific domain for when it's used.
+
+Suppose you have already created a controller called `controller1`. You can add that controller onto a piecewise controller named `finalController` by typing
+```java title="Constants.java"
+    PiecewiseController finalController = Controller.piecewise(controller1);
+```
+If you have another controller named `controller2` that you want to add to `finalController`, type
+```java title="Constants.java"
+    finalController.put(threshold, controller2);
+```
+Now, `finalController` will use `controller1` if the error that `finalController` receives is less than `threshold`. If the error `finalController` receives is greater than `threshold`, it will use `controller2` instead.
+You can add more controllers to `finalController`, but that generally isn't needed.
+
+Piecewise controllers are very useful when you want them to behave in certain ways based on the size of the error its given.
+For example, a piecewise controller could consist of one controller that handles small errors (the small controller) and another controller that handles large errors (the large controller).
+In the ForesightConfig method, you can type
+```java title="Constants.java"
+    Controller largeTranslationalForward = Controller.proportional(.3);
+    Controller smallTranslationalForward = Controller.proportional(.1);
+    c.forwardTranslational.set(Controller.piecewise(smallTranslationalForward).put(threshold, largeTranslationalForward));
+```
+With this setup, you can tune the large controller to correct more aggressively (give it a larger `kP` value) than the small controller does (give it a smaller `kP` value).This enables the robot to correct quickly from larger errors while minimizing overshoot and oscillations when correcting from smaller errors.
+This can similarly be done for the `translationalLateral` controller.
+
+<Callout title="Common Mistakes" type="warning">
+Using a piecewise controller for `headingFeedback` isn't recommended. Instead, use a proportional controller.
+</Callout>
+
+### Feedforward
+#### Static Feedforward
+The static feedforward controller returns a constant number in the same direction of the robot's error. To create such a controller named `controller1`, type
+```java title="Constants.java"
+    Controller controller1 = Controller.staticFeedforward(double kS);
+```
+Here, `controller1` will return positive `kS` if the error it receives is positive, and will return negative `kS` if the error it receives is negative.
+
+The static feedforward can be used to send a small amount of power to the drivetrain motors to compensate for the friction with the motors, wheels, and ground.
+To add the static feedforward controller `controller1` onto an existing controller like `controller2`, type
+```java title="Constants.java"
+    controller2.plus(controller1)
+```
+Now, `controller2` will return the the sum of what it would originally return and the value returned by `controller1`.
+If the static feedforward controller's `kS` value is set too high, this may cause the motors to be given too much power, causing the robot to overshoot or jitter.
+
+#### Proportional Feedforward
+The proportional feedforward controller returns a number proportional to the robot's target. To create such a controller named `controller1`, type
+```java title="Constants.java"
+    Controller controller1 = Controller.proportionalFeedforward(double kV);
+```
+Here, `controller1` will return `target` * `kV`.
+
+### Other Methods
+#### Plus and Minus
+The `plus` and `minus` methods allow you to add or subtract the outputs of two controllers. For example, if you have already created two controllers, `controller1` and `controller2`, then
+```java title="Constants.java"
+    controller1.plus(controller2);
+```
+gives a controller that adds the two values returned by `controller1` and `controller2`.
+On the other hand,
+```java title="Constants.java"
+    controller1.minus(controller2);
+```
+gives a controller that subtracts the two values returned by `controller1` and `controller2`.
+
+#### Adding multiple controllers
+If you want to add multiple controllers together, you can use the `sum` method. For example, if you have controllers `controller_1`, `controller_2`, . . . `controller_n`, type
+```java title="Constants.java"
+    controller_final = Controller.sum(controller_1, controller_2, ..., controller_n);
+```
+Now, `controller_final` will return the sum of the values returned by `controller_1`, `controller_2`, . . . `controller_n`.
+<Callout title="Note" type="info">
+  The `sum` method can accept any number of parameters!
+</Callout>
+
+#### Times
+The `times` method scales the values returned by a controller. For example,
+```java title="Constants.java"
+    controller1.times(double scalar);
+```
+will give a controller that returns the output of `controller1` multiplied by `scalar`.
+
+### Using the controllers in Foresight
+To assign `controller1` to a controller that Foresight uses, such as `forwardTranslational`, `strafeTranslational`, or `headingFeedback`, type
+```java
+c.forwardTranslational.set(controller1);
+```
+in the `foresightConfig` method.
