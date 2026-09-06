@@ -2,6 +2,7 @@
   "pages": [
     "index",
     "installation",
+    "constants",
     "tuning",
     "faq",
     "pedro-v-roadrunner",
