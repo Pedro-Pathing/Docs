@@ -38,35 +38,6 @@ the follower's current max power.
     `follow()` executes the path using whichever `interpolation` method was defined for the specific `Path` originally. More info at [interpolation guide](../pathing/reference/interpolation).
 </Callout>
 
-## Hold
-
-Makes the robot hold a position and its heading. The command finishes when the robot is
-within tolerance of the target (based on translational and heading error).
-
-To hold the robot's current position:
-
-```java
-Command stayHere = hold(follower);
-```
-
-To hold a specific pose using [`PoseFactory`](../pathing/reference/posefactory):
-
-```java
-PoseFactory p = PoseFactory.degrees();
-
-Command holdAtBasket = hold(follower, p.of(50, 30, 90));
-```
-
-## Turn To
-
-Makes the robot turn in place to a specified heading (in radians). The
-command finishes when the robot reaches the target heading.
-
-```java
-Command faceForward = turnTo(follower, Math.toRadians(0));
-Command faceLeft = turnTo(follower, Math.toRadians(90));
-```
-
 ## Composing Pedro Commands
 
 Since Pedro commands are regular Ivy commands, you can compose them with
