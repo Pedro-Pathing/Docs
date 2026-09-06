@@ -6,54 +6,192 @@ description: A localizer that uses three odometry wheels and an IMU
 import { Callout } from 'fumadocs-ui/components/callout'
 
 <Callout title="Prerequisites" type="info">
-  Ensure that three odometry pods are connected: two that are parallel to the length
-  of your chassis and another that is perpendicular to your chassis length. These should be plugged
-  into ports that have motors on them preferably. Due to technical limitations on REV hubs, encoder ports
-  0 and 3 are the fastest and are recommended for the two parallel pods.
+  Ensure that three odometry pods are connected: two parallel to the length of your chassis and one
+  perpendicular to the chassis. The Three Wheel + IMU AutoTuner will ask for the HardwareMap name
+  of the motor port each encoder is plugged into, as well as the IMU HardwareMap name and Control Hub orientation.
 </Callout>
 
 ## Setup
 
-In `Constants.java`, add an instance of `ThreeWheelIMUConfig`. Make sure to replace the hardware map names
-with the actual names of the motor port they are plugged into. You must also set the IMU orientation to match the orientation of your Control Hub.
+In `Constants.java`, add an instance of `ThreeWheelIMUConfig`.
 
 ```java title="Constants.java"
-public static ThreeWheelIMUConfig localizerConfig = new ThreeWheelIMUConfig(
-        c -> {
-            c.forwardTicksToInches.set(0.5);
-            c.strafeTicksToInches.set(0.1);
-            c.turnTicksToRadians.set(0.5);
-            c.leftPodY.set(0.5);
-            c.rightPodY.set(0.3);
-            c.strafePodX.set(0.2);
-            c.leftEncoderName.set("leftFront");
-            c.rightEncoderName.set("rightFront");
-            c.strafeEncoderName.set("leftRear");
-            c.leftEncoderDirection.set(Encoder.REVERSE);
-            c.rightEncoderDirection.set(Encoder.REVERSE);
-            c.strafeEncoderDirection.set(Encoder.REVERSE);
-            c.imuName.set("imu");
-            c.imuOrientation.set (new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                    RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
-        }
-);```
+public static ThreeWheelIMUConfig localizerConfig = new ThreeWheelIMUConfig(c -> {
+    c.leftEncoderName.set("lf");
+    c.rightEncoderName.set("rr");
+    c.strafeEncoderName.set("lr");
 
-Then, add `.threeWheelIMULocalizer` to `create`:
+    c.imuName.set("imu");
+    c.imuOrientation.set(new RevHubOrientationOnRobot(
+            RevHubOrientationOnRobot.LogoFacingDirection.UP,
+            RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+    ));
+
+    c.leftPodY.set(0.0);
+    c.rightPodY.set(0.0);
+    c.strafePodX.set(0.0);
+
+    c.forwardTicksToInches.set(1.0);
+    c.strafeTicksToInches.set(1.0);
+    c.turnTicksToRadians.set(1.0);
+
+    c.leftEncoderDirection.set(Encoder.FORWARD);
+    c.rightEncoderDirection.set(Encoder.FORWARD);
+    c.strafeEncoderDirection.set(Encoder.FORWARD);
+});
+```
+
+The encoder names above are examples. Use the HardwareMap name of the motor port each odometry encoder is plugged into.
+
+Set `imuName` to the HardwareMap name of your IMU. For a Control Hub, this is normally `imu`.
+
+Set `imuOrientation` to match the physical orientation of your Control Hub.
+
+Then use the Three Wheel + IMU localizer in your follower:
 
 ```java title="Constants.java"
 return new Follower(
-    new threeWheelIMULocalizer(h, localizerConfig),
-    // Drivetrain Config
-    // Foresight Config
-    );
+        new ThreeWheelIMULocalizer(h, localizerConfig),
+        // Drivetrain
+        // Drive Algorithm
+);
 ```
 
-### Offsets
+## Automatic Tuning
 
-You must also set your odometry pod offsets, which is where they are
-relative to your robot's center of rotation. You can use the diagram below
-to find them. **Offsets are in inches.**
+The Three Wheel + IMU AutoTuner can automatically determine the encoder resolution, encoder directions,
+pod offsets, and turn multiplier for your `ThreeWheelIMUConfig`.
+
+### Add the Tuner
+
+Add the tuner to your tuning file:
+
+```java
+@Tuner
+public static Procedure threeWheelIMUTuner() {
+    return new ThreeWheelIMUTuner();
+}
+```
+
+Import:
+
+```java
+import org.firstinspires.ftc.teamcode.pedroPathing.procedures.ThreeWheelIMUTuner;
+```
+
+### Open AutoTune
+
+While connected to the Robot Controller, open the following address in your browser: http://192.168.43.1:10158
+
+Select **Octoquad Procedure**.
+
+Select **Three Wheel + IMU Tuner**.
+
+### Setup
+
+The first screen asks for the three encoder motor-port names, the IMU HardwareMap name, and the Control Hub orientation.
+
+The defaults are:
+
+```text
+Left Encoder Motor Name:   lf
+Right Encoder Motor Name:  rr
+Strafe Encoder Motor Name: lr
+IMU HardwareMap Name:      imu
+Logo Facing Direction:     UP
+USB Facing Direction:      BACKWARD
+```
+
+<Callout title="Important" type="warning">
+  The encoder names are the HardwareMap names of the motors whose encoder ports the odometry pods are plugged into.
+</Callout>
+
+Choose the Logo Facing Direction and USB Facing Direction that match the physical orientation of your Control Hub.
+
+### Encoder Resolution Identification
+
+Enter the exact distance, in inches, that you will move the robot during each encoder resolution test.
+
+The default is:
+
+```text
+48
+```
+
+If you leave this at `48`, move the robot exactly **48 inches** during each test.
+
+### Left Encoder Resolution and Direction
+
+Press **Continue**, start the tuning OpMode, and push the robot forward the exact distance entered above.
+
+When the movement is complete, stop the OpMode.
+
+The tuner determines the left encoder resolution and direction.
+
+### Right Encoder Resolution and Direction
+
+Press **Continue**, start the tuning OpMode, and push the robot forward the same exact distance.
+
+When the movement is complete, stop the OpMode.
+
+The tuner determines the right encoder resolution and direction.
+
+### Strafe Encoder Resolution and Direction
+
+Press **Continue**, start the tuning OpMode, and push the robot left the exact distance entered above.
+
+When the movement is complete, stop the OpMode.
+
+The tuner determines the strafe encoder resolution and direction.
+
+<Callout title="Coordinate Direction" type="info">
+  Positive X is forward, positive Y is left, and positive heading is counterclockwise.
+</Callout>
+
+### Left Pod Offset
+
+Press **Continue**, start the tuning OpMode, and rotate the robot exactly **180 degrees counterclockwise**
+about the robot's center of rotation.
+
+Keep the center of the robot as fixed as possible.
+
+When the rotation is complete, stop the OpMode.
+
+### Right Pod Offset
+
+Repeat the same process for the right pod.
+
+Rotate the robot exactly **180 degrees counterclockwise** about the same center of rotation, then stop the OpMode.
+
+### Turn Multiplier Identification
+
+Press **Continue**, start the tuning OpMode, and rotate the robot exactly **360 degrees counterclockwise**.
+
+Use a fixed reference point to make the full rotation as accurate as possible.
+
+When the rotation is complete, stop the OpMode.
+
+### Applying the Results
+
+After the tuner finishes, open the **Java** tab in AutoTune.
+
+The generated `ThreeWheelIMUConfig` includes:
+
+- Encoder HardwareMap names
+- IMU HardwareMap name
+- Control Hub orientation
+- Left, right, and strafe pod offsets
+- Forward and strafe encoder resolution
+- Turn multiplier
+- Encoder directions
+
+Copy the generated configuration into `Constants.java`.
+
+## Manual Offset Tuning
+
+Offsets can also be found manually using the diagram below. Offsets are in inches.
+
+Set your odometry pod offsets to define where they are relative to your robot's center of rotation.
 
 <img
   className="inline-block dark:hidden"
@@ -67,106 +205,51 @@ to find them. **Offsets are in inches.**
   alt="Odometry Pod Offset Diagram"
 />
 
-Once you have found your offsets, add them to your localizer constants by
-using `c.leftPodY.set()`, `c.rightPodY.set()` and `c.strafePodX.set()`.
-
 ## Encoder Directions
 
-We will now determine the encoder directions. First, select and run
-localization test under the localization folder in the tuning OpMode. Then,
-move the robot forward. The x coordinate should increase. Next, move the
-robot left. The y coordinate should increase. If either of those does not
-happen, you must reverse the respective encoder. To reverse an encoder, add
+You can also verify the encoder directions manually.
 
-To reverse an encoder, add one of the following to `ThreeWheelIMUConfig`:
+Move the robot forward. The X position should increase.
+
+Move the robot left. The Y position should increase.
+
+If either direction is incorrect, reverse the respective encoder in `ThreeWheelIMUConfig`:
 
 ```java title="Constants.java"
-c.leftEncoderDirection.set(Encoder.REVERSE);  
-c.rightEncoderDirection.set(Encoder.FORWARD);
-
-// and/or:
-
+c.leftEncoderDirection.set(Encoder.REVERSE);
+c.rightEncoderDirection.set(Encoder.REVERSE);
 c.strafeEncoderDirection.set(Encoder.REVERSE);
 ```
 
-<Callout title="Important" type="warning">
-  If when you push the robot forward both x and y change, it is likely that either your offsets have the wrong sign,
-  or that the hardwareMap is incorrect (ie. forward encoder is actually your strafe encoder and vise versa)
-</Callout>
+## Testing the Localizer
 
-## Forward Tuner
+After applying the generated configuration, run the localization test.
 
-We will now adjust multipliers that convert encoder ticks into real-world
-measurements: inches. This ensures your localizer's readings are accurate.
+Move the robot forward and verify that X increases.
 
-In the tuning OpMode, under localization, select and start the forward tuner.
-Then, push the robot **forward 48 inches** (exactly 2 field tiles). This
-distance is configurable if needed. Once you push the robot forward, two
-numbers will be displayed on telemetry:
+Move the robot left and verify that Y increases.
 
-- The distance the robot thinks it has traveled
-- The multiplier; this is the number you want.
-
-Add the multiplier to your `ThreeWheelIMUConfig` by adding the following.
-
-```java title="Constants.java"
-c.forwardTicksToInches.set(multiplier)
-```
-
-<Callout title="Tip" type="info">
-  It is recommended that you run these tests multiple times and average the results,
-  as it can result in more accurate localization.
-</Callout>
-
-## Lateral Tuner
-
-The lateral tuner is very similar to the forward tuner, except it is
-sideways. In the tuning OpMode, under localization, select and start the
-lateral tuner. Push the robot **left 48 inches** (exactly 2 field tiles). As
-with the forward tuner, this distance is configurable.
-
-Lastly, add the multiplier to `ThreeWheelIMUConfig` by adding the following line.
-
-```java title="Constants.java"
-c.strafeTicksToInches.set(multiplier)
-```
-
-## Turn Tuner
-
-The turn tuner is similar to both the forward tuner and lateral tuner, except it is
-rotational. Place the robot so it aligns to a fixed reference point (e.g., edge of a field tile).
-In the tuning OpMode, under localization, select and start the
-turn tuner. Rotate the robot **counterclockwise one full rotation**. As
-with the previous tuners, this amount is configurable.
-
-Lastly, add the multiplier to `ThreeWheelIMUConfig` by adding the following line.
-
-```java title="Constants.java"
-c.turnTicksToRadians.set(multiplier)
-```
-
-## Testing the localizer
-
-Once you have completed the tuning steps, you can test your localizer as
-described
-[on the localization page](/docs/pathing/tuning/localization#localization-test).
-
-Congratulations on successfully tuning your localizer!
+Rotate the robot counterclockwise and verify that heading increases.
 
 <Callout title="Note on ESD" type="warning">
-    If you robot seems to:
+  If the robot suddenly changes heading, turns toward an incorrect angle, or develops large heading errors,
+  the IMU may be affected by electrostatic discharge.
 
-    1. Turn or face a different direction when starting a path
-    2. Turn to a incorrect angle or miss with large, unfixable errors
+  Consider grounding the robot with a grounding strap and reviewing the FIRST documentation on ESD.
 
-    Your robot's IMU might be affected by ESD (electrostatic discharge). Consider grounding
-    the robot with a [grounding strap](https://www.revrobotics.com/rev-31-1269/) and/or 
-    [reading this guide from FIRST to understand ESD](https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/managing_esd/managing-esd.html)
-
-    If after the above you cannot fix the issue, [switch to the non-IMU ThreeWheel Localizer](/docs/pathing/tuning/localization/three-wheel), as
-    it will be significantly more accurate than an interfered IMU.
+  If IMU interference cannot be resolved, consider using the non-IMU Three Wheel localizer instead.
 </Callout>
 
 ## Troubleshooting
+
+If localization is incorrect, check:
+
+- Encoder HardwareMap names
+- Encoder directions
+- IMU HardwareMap name
+- Logo Facing Direction
+- USB Facing Direction
+- Pod offsets
+- Encoder resolution values
 
 If you have any problems, see the [troubleshooting page](/docs/pathing/troubleshooting).

@@ -6,51 +6,321 @@ description: A localizer that uses three odometry wheels
 import { Callout } from 'fumadocs-ui/components/callout'
 
 <Callout title="Prerequisites" type="info">
-  Ensure that three odometry pods are connected: two that are parallel to the length
-  of your chassis and another that is perpendicular to your chassis length. These should be plugged
-  into ports that have motors on them preferably. Due to technical limitations on REV hubs, encoder ports
-  0 and 3 are the fastest and are recommended for the two parallel pods.
+  Ensure that three odometry pods are connected: two parallel to the length of your chassis
+  and one perpendicular to the chassis. The left and right pods measure forward motion, while
+  the strafe pod measures sideways motion.
+
+  The Three Wheel AutoTuner will ask for the HardwareMap name of the motor port that each
+  odometry encoder is plugged into.
+
+  The default encoder names are:
+
+  - Left parallel pod: `lf`
+  - Right parallel pod: `rr`
+  - Strafe pod: `lr`
+
+  The tuner also expects drive motors named `lf`, `lr`, `rf`, and `rr` to exist in the HardwareMap.
+</Callout>
+
+<Callout title="Common Mistakes" type="warn">
+  - Make sure the left and right pods are parallel to the robot's forward direction.
+  - Make sure the strafe pod is perpendicular to the forward pods.
+  - Enter the HardwareMap name of the motor port that each odometry encoder is plugged into.
+  - Make sure drive motors named `lf`, `lr`, `rf`, and `rr` exist before running the tuner.
+  - Move the robot **by hand** during every measurement. The tuner sets drive motor power to zero.
+  - Complete the requested motion, stop moving, and then press **Stop** to save the measurement.
+  - During offset and turn identification, rotate **counterclockwise** about the robot's center.
+  - Pedro uses **+X forward**, **+Y left**, and positive heading counterclockwise.
 </Callout>
 
 ## Setup
 
-In `Constants.java`, add an instance of `ThreeWheelConfig`. Make sure to replace the hardware map names
-with the actual names of the motor port they are plugged into.
+In `Constants.java`, add an instance of `ThreeWheelConfig`.
 
 ```java title="Constants.java"
-public static ThreeWheelConfig localizerConfig = new ThreeWheelConfig(
-  c -> {
-      c.forwardTicksToInches.set(0.5);
-      c.strafeTicksToInches.set(0.1);
-      c.turnTicksToRadians.set(0.5);
-      c.leftPodY.set(0.5);
-      c.rightPodY.set(0.3);
-      c.strafePodX.set(0.2);
-      c.leftEncoderName.set("leftE");
-      c.rightEncoderName.set("rightE");
-      c.strafeEncoderName.set("strafE");
-      c.leftEncoderDirection.set(Encoder.REVERSE);
-      c.rightEncoderDirection.set(Encoder.REVERSE);
-      c.strafeEncoderDirection.set(Encoder.REVERSE);
-  }
-);
+public static ThreeWheelConfig localizerConfig = new ThreeWheelConfig(c -> {
+    c.leftEncoderName.set("lf");
+    c.rightEncoderName.set("rr");
+    c.strafeEncoderName.set("lr");
+
+    c.leftPodY.set(0.0);
+    c.rightPodY.set(0.0);
+    c.strafePodX.set(0.0);
+
+    c.forwardTicksToInches.set(1.0);
+    c.strafeTicksToInches.set(1.0);
+    c.turnTicksToRadians.set(1.0);
+
+    c.leftEncoderDirection.set(Encoder.FORWARD);
+    c.rightEncoderDirection.set(Encoder.FORWARD);
+    c.strafeEncoderDirection.set(Encoder.FORWARD);
+});
 ```
 
-Then, add `.threeWheelLocalizer` to `create`:
+The values above are starting values only. The Three Wheel AutoTuner will determine the encoder
+resolutions, encoder directions, and pod offsets for your robot.
+
+The encoder names above are examples. During AutoTune, enter the HardwareMap name of the motor
+port that each odometry encoder is plugged into. The generated configuration will use the names
+you entered.
+
+Then, add `ThreeWheelLocalizer` to your `Follower`:
 
 ```java title="Constants.java"
-return new Follower(
-    new threeWheelLocalizer(h, localizerConfig),
-    // Drivetrain Config
-    // Foresight Config
+public static Follower create(HardwareMap h) {
+    return new Follower(
+            new ThreeWheelLocalizer(h, localizerConfig),
+            // Drivetrain Config
+            // Foresight Config
     );
+}
 ```
 
-### Offsets
+## Automatic Tuning
 
-You must also set your odometry pod offsets, which are
-relative to your robot's center of rotation. You can use the diagram below
-to find them. **Offsets are in inches.**
+The Three Wheel AutoTuner can automatically determine the values needed for your
+`ThreeWheelConfig`, including encoder directions, encoder resolutions, pod offsets, and the
+turn multiplier.
+
+During the procedure, you will enter which motor encoder ports your odometry pods are plugged
+into, then move the robot by hand when AutoTune asks you to.
+
+The tuner determines:
+
+- `forwardTicksToInches`
+- `strafeTicksToInches`
+- `turnTicksToRadians`
+- `leftEncoderDirection`
+- `rightEncoderDirection`
+- `strafeEncoderDirection`
+- `leftPodY`
+- `rightPodY`
+- `strafePodX`
+
+<Callout title="How to Run the Tests" type="info">
+  For each test, press **Continue**, start the tuning OpMode, perform the requested motion,
+  stop moving the robot, and then press **Stop** to save that measurement.
+
+  Do not drive the robot with the gamepad during these tests. Move it by hand.
+</Callout>
+
+### Add the Tuner
+
+Inside your `Tuning` class, add:
+
+```java title="Tuning.java"
+@Tuner
+public static Procedure threeWheelTuner() {
+    return new ThreeWheelTuner();
+}
+```
+
+Make sure `ThreeWheelTuner` is imported:
+
+```java title="Tuning.java"
+import org.firstinspires.ftc.teamcode.pedroPathing.procedures.ThreeWheelTuner;
+```
+
+Build and send the updated code to the Robot Controller.
+
+### Open AutoTune
+
+While connected to the Robot Controller, open the following address in your browser: http://192.168.43.1:10158
+
+Select **Three Wheel Tuner**.
+
+### Encoder Setup
+
+Enter the **HardwareMap name** of the motor port that each odometry encoder is plugged into.
+
+For example, if your left pod encoder is plugged into the encoder port for a motor named `lf`
+in your Robot Configuration, enter:
+
+```text
+lf
+```
+
+in the **Left Encoder Motor Name** field.
+
+Do the same for the right and strafe pods.
+
+The default values are:
+
+```text
+Left Encoder Motor Name:   lf
+Right Encoder Motor Name:  rr
+Strafe Encoder Motor Name: lr
+```
+
+Change these names to match your robot, then press **Submit**.
+
+<Callout title="Important" type="info">
+  Enter the HardwareMap name of the **motor whose encoder port the odometry pod is plugged into**.
+
+  These are not separate HardwareMap names for the odometry pods.
+</Callout>
+
+### Encoder Resolution Setup
+
+Next, enter the distance in inches that you want to move the robot during the encoder resolution
+tests.
+
+The default is:
+
+```text
+48
+```
+
+For example, if you leave the value at `48`, you must move the robot exactly **48 inches** during
+each resolution test.
+
+Enter the distance you want to use, then press **Submit**.
+
+<Callout title="Measurement Tip" type="info">
+  Measure the test distance as accurately as possible. Keep the robot straight during the
+  forward pushes and avoid turning during the strafe push. Running the tuner multiple times
+  and comparing the generated values can help identify inconsistent measurements.
+</Callout>
+
+### Left Encoder Resolution and Direction
+
+Press **Continue**, then start the tuning OpMode.
+
+Push the robot straight **forward** by the exact distance entered during setup.
+
+For example, if the distance is 48 inches, push the robot forward exactly 48 inches.
+
+While the test is running, telemetry displays information including:
+
+- Left, right, and strafe SDK encoder ticks
+- Corrected encoder ticks
+- Localizer X and Y
+- Total heading
+- The selected pod
+- The measured movement
+
+After the robot has moved the full distance, stop moving it and press **Stop**.
+
+The tuner will determine the encoder resolution and direction for the left parallel pod.
+
+### Right Encoder Resolution and Direction
+
+Press **Continue**, then start the tuning OpMode.
+
+Push the robot straight **forward** by the same exact distance.
+
+After the robot has moved the full distance, stop moving it and press **Stop**.
+
+The tuner will determine the encoder resolution and direction for the right parallel pod.
+
+The final `forwardTicksToInches` value is calculated using both parallel pod measurements.
+
+### Strafe Encoder Resolution and Direction
+
+Press **Continue**, then start the tuning OpMode.
+
+Push the robot straight to the **left** by the exact distance entered during setup.
+
+After the robot has moved the full distance, stop moving it and press **Stop**.
+
+The tuner determines:
+
+```java
+c.strafeTicksToInches.set(...);
+c.strafeEncoderDirection.set(...);
+```
+
+<Callout title="Coordinate Direction" type="info">
+  Pedro uses **+X forward** and **+Y left**. During this test, move the robot to the **left**.
+</Callout>
+
+### Left Pod Offset Identification
+
+Press **Continue**, then start the tuning OpMode.
+
+Rotate the robot exactly **180 degrees counterclockwise** about the robot's center of rotation.
+
+Keep the center of the robot in the same position as closely as possible.
+
+After completing the rotation, stop moving and press **Stop**.
+
+The tuner uses the measured parallel pod travel to calculate `leftPodY`.
+
+### Right Pod Offset Identification
+
+Press **Continue**, then start the tuning OpMode.
+
+Again, rotate the robot exactly **180 degrees counterclockwise** about the robot's center.
+
+After completing the rotation, stop moving and press **Stop**.
+
+The tuner uses the measured parallel pod travel to calculate `rightPodY`.
+
+<Callout title="Offset Validation" type="warn">
+  The measured `leftPodY` must be greater than the measured `rightPodY`. If the tuner aborts
+  at this step, verify the pod mapping and make sure both offset tests were rotated
+  counterclockwise about the robot's center.
+</Callout>
+
+### Turn Multiplier Identification
+
+Press **Continue**, then start the tuning OpMode.
+
+Rotate the robot exactly **360 degrees counterclockwise**.
+
+Use a fixed reference point so the full rotation can be measured accurately.
+
+After completing the rotation, stop moving and press **Stop**.
+
+The tuner calculates:
+
+```java
+c.turnTicksToRadians.set(...);
+```
+
+The tuner also uses the offset-stage measurements together with the turn measurement to finish
+calculating:
+
+```java
+c.strafePodX.set(...);
+```
+
+### Applying the Results
+
+Once the tuner is complete, open the **Java** tab.
+
+AutoTune will generate a complete `ThreeWheelConfig` using the values determined during the
+tuning procedure.
+
+The generated configuration includes:
+
+- Left encoder name
+- Right encoder name
+- Strafe encoder name
+- Left pod Y offset
+- Right pod Y offset
+- Strafe pod X offset
+- Forward ticks to inches
+- Strafe ticks to inches
+- Turn ticks to radians
+- Left encoder direction
+- Right encoder direction
+- Strafe encoder direction
+
+The generated encoder names will match the HardwareMap names entered during **Encoder Setup**.
+
+Copy the generated configuration into the `ThreeWheelConfig` in your `Constants.java` file.
+
+<Callout title="Use the Generated Values" type="info">
+  Use the complete configuration generated by the tuner for your robot instead of the
+  example values shown on this page.
+</Callout>
+
+## Manual Offset Tuning
+
+Offsets can also be found manually using the diagram below. Offsets are in inches.
+
+Set your odometry pod offsets to define where they are relative to your robot's center of rotation.
 
 <img
   className="inline-block dark:hidden"
@@ -64,94 +334,199 @@ to find them. **Offsets are in inches.**
   alt="Odometry Pod Offset Diagram"
 />
 
-Once you have found your offsets, add them to your localizer constants by
-using `c.leftPodY.set()`, `c.rightPodY.set()` and `c.strafePodX.set()`.
+## Encoder Resolution
+
+Encoder resolution can also be tuned manually.
+
+Set the encoder resolution values in your `ThreeWheelConfig`:
+
+```java title="Constants.java"
+c.forwardTicksToInches.set(...);
+c.strafeTicksToInches.set(...);
+c.turnTicksToRadians.set(...);
+```
 
 ## Encoder Directions
 
-We will now determine the encoder directions. First, select and run
-localization test under the localization folder in the tuning OpMode. Then,
-move the robot forward. The x coordinate should increase. Next, move the
-robot left. The y coordinate should increase. If these do not happen, the
-respective encoders must be the inverse of what they currently are (NOTE:
-both parallel pods must be inversed if the x coordinate decreases).
-To reverse an encoder, add
+The AutoTuner determines all three encoder directions.
 
-To reverse an encoder, add one of the following to `ThreeWheelConfig`:
+The left pod uses:
 
 ```java title="Constants.java"
-c.leftEncoderDirection.set(Encoder.REVERSE);  
+c.leftEncoderDirection.set(Encoder.FORWARD);
+```
+
+or:
+
+```java title="Constants.java"
+c.leftEncoderDirection.set(Encoder.REVERSE);
+```
+
+The right pod uses:
+
+```java title="Constants.java"
 c.rightEncoderDirection.set(Encoder.FORWARD);
+```
 
-// and/or:
+or:
 
+```java title="Constants.java"
+c.rightEncoderDirection.set(Encoder.REVERSE);
+```
+
+The strafe pod uses:
+
+```java title="Constants.java"
+c.strafeEncoderDirection.set(Encoder.FORWARD);
+```
+
+or:
+
+```java title="Constants.java"
 c.strafeEncoderDirection.set(Encoder.REVERSE);
 ```
 
-<Callout title="Important" type="warning">
-  If when you push the robot forward both x and y change, it is likely that either your offsets have the wrong sign,
-  or that the hardwareMap is incorrect (ie. forward encoder is actually your strafe encoder and vise versa)
+Use the directions generated by the Three Wheel tuner.
+
+<Callout title="Encoder Direction" type="info">
+  Pedro's `Encoder` direction also accounts for the direction of the `DcMotorEx` whose encoder
+  port is being used. Use the direction generated by this tuner rather than copying a direction
+  from a different localizer.
 </Callout>
 
-## Forward Tuner
+## Testing the Localizer
 
-We will now adjust multipliers that convert encoder ticks into real-world
-measurements: inches. This ensures your localizer's readings are accurate.
+Once you have completed the tuning steps, test your localizer using the
+[**localization test**](/docs/pathing/tuning/localization#localization-test).
 
-<Callout title="Tip" type="info">
-  It is recommended that you run these tests multiple times and average the results,
-  as it can result in more accurate localization.
-</Callout>
+Move the robot forward. X should increase.
 
-In the tuning OpMode, under localization, select and start the forward tuner.
-Then, push the robot **forward 48 inches** (exactly 2 field tiles). This
-distance is configurable if needed. Once you push the robot forward, two
-numbers will be displayed on telemetry:
+Move the robot left. Y should increase.
 
-- The distance the robot thinks it has traveled
-- The multiplier; this is the number you want.
+Rotate the robot counterclockwise. Heading should increase.
 
-Add the multiplier to your `ThreeWheelConfig` by adding the following.
+If the reported motion does not match the physical robot motion, rerun the tuner and verify:
 
-```java title="Constants.java"
-c.forwardTicksToInches.set(multiplier)
-```
+- The encoder mapping
+- The requested push distances
+- The counterclockwise rotations
+- The generated encoder directions
 
-## Lateral Tuner
-
-The lateral tuner is very similar to the forward tuner, except it is
-sideways. In the tuning OpMode, under localization, select and start the
-lateral tuner. Push the robot **left 48 inches** (exactly 2 field tiles). As
-with the forward tuner, this distance is configurable.
-
-Lastly, add the multiplier to `ThreeWheelConfig` by adding the following line.
-
-```java title="Constants.java"
-c.strafeTicksToInches.set(multiplier)
-```
-
-## Turn Tuner
-
-The turn tuner is similar to both the forward tuner and lateral tuner, except it is
-rotational. Place the robot so it aligns to a fixed reference point (e.g., edge of a field tile).
-In the tuning OpMode, under localization, select and start the
-turn tuner. Rotate the robot **counterclockwise one full rotation**. As
-with the previous tuners, this amount is configurable.
-
-Lastly, add the multiplier to `ThreeWheelConfig` by adding the following line.
-
-```java title="Constants.java"
-c.turnTicksToRadians.set(multiplier)
-```
-
-## Testing the localizer
-
-Once you have completed the tuning steps, you can test your localizer as
-described
-[on the localization page](/docs/pathing/tuning/localization#localization-test).
-
-Congratulations on successfully tuning your localizer!
+Congratulations on successfully tuning your Three Wheel localizer!
 
 ## Troubleshooting
 
-If you have any problems, see the [troubleshooting page](/docs/pathing/troubleshooting).
+If you have any problems, see the [**troubleshooting page**](/docs/pathing/troubleshooting).
+
+### Tuner cannot find a motor
+
+The current Three Wheel tuner expects these drive motor HardwareMap names to exist:
+
+```text
+lf
+lr
+rf
+rr
+```
+
+The odometry encoder motor ports are selected during **Encoder Setup**.
+
+If an odometry encoder cannot be found, verify that the HardwareMap name entered during setup
+matches the motor port that the encoder is plugged into.
+
+### A resolution stage reports no movement
+
+Make sure you moved the robot in the requested direction before pressing **Stop**.
+
+For the left and right stages, push the robot forward.
+
+For the strafe stage, push the robot left.
+
+Also verify that the intended odometry encoder is connected to the motor encoder port entered
+during **Encoder Setup**.
+
+### Offset identification aborts
+
+Make sure the robot was rotated approximately 180 degrees **counterclockwise** about its center
+during both offset stages.
+
+The tuner expects the calculated left offset to be greater than the calculated right offset.
+
+### Turn identification aborts
+
+Rotate the robot a full 360 degrees **counterclockwise** before pressing **Stop**.
+
+The tuner requires a positive heading change during this stage.
+
+## Complete Example
+
+After completing the tuner, your Three Wheel setup should look similar to the following.
+
+<Callout title="Example Values" type="info">
+  The values below are examples only. Use the complete configuration generated by AutoTune
+  for your own robot.
+</Callout>
+
+```java title="Constants.java"
+package org.firstinspires.ftc.teamcode.pedroPathing;
+
+import com.pedropathing.algorithm.Foresight;
+import com.pedropathing.algorithm.ForesightConfig;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.revhub.drivetrains.Mecanum;
+import com.pedropathing.revhub.drivetrains.MecanumConfig;
+import com.pedropathing.revhub.localizers.Encoder;
+import com.pedropathing.revhub.localizers.ThreeWheelConfig;
+import com.pedropathing.revhub.localizers.ThreeWheelLocalizer;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+public class Constants {
+
+    public static MecanumConfig driveConfig = new MecanumConfig(c -> {
+        c.frontLeftName.set("lf");
+        c.backLeftName.set("lr");
+        c.frontRightName.set("rf");
+        c.backRightName.set("rr");
+
+        c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+
+        c.manualBrakeMode.set(true);
+    });
+
+    public static ThreeWheelConfig localizerConfig = new ThreeWheelConfig(c -> {
+        c.leftEncoderName.set("lf");
+        c.rightEncoderName.set("rr");
+        c.strafeEncoderName.set("lr");
+
+        c.leftPodY.set(5.5);
+        c.rightPodY.set(-5.5);
+        c.strafePodX.set(-1.5);
+
+        c.forwardTicksToInches.set(0.0020);
+        c.strafeTicksToInches.set(0.0020);
+        c.turnTicksToRadians.set(0.0020);
+
+        c.leftEncoderDirection.set(Encoder.FORWARD);
+        c.rightEncoderDirection.set(Encoder.FORWARD);
+        c.strafeEncoderDirection.set(Encoder.FORWARD);
+    });
+
+    public static ForesightConfig foresightConfig = new ForesightConfig(c -> {
+    });
+
+    public static Follower create(HardwareMap h) {
+        return new Follower(
+                new ThreeWheelLocalizer(h, localizerConfig),
+                new Mecanum(h, driveConfig),
+                new Foresight(foresightConfig)
+        );
+    }
+}
+```
+
+Your drivetrain and Foresight configuration will depend on your robot. The important parts for
+Three Wheel localization are `ThreeWheelConfig` and `ThreeWheelLocalizer`.

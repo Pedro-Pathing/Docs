@@ -33,22 +33,5 @@ Path path = Paths.path(line, curve);
 ```
 
 ### Interpolation
-Each path needs some sort of interpolation. A path can have its own interpolation, but if the path it is contained in has its interpolation set, the child path will assume the interpolation of the parent path.
 
-* **Global Interpolation:** If you set the interpolation of `path`, the interpolation will take effect over the entire set of paths, replacing any individual interpolations set on the child paths.
-```java
-path.linear(start, end)
-  ```
-This will set the interpolation of the entire path to linear, regardless of what the individual paths have set.
-
-* **Local Interpolation:** If you set the individual interpolation of `line` or `curve`, it applies directly to that specific child path.
-```java
-line.constant(start)
-curve.facingPoint(end)
-  ```
-This will set the interpolation of the line path to constant and the curve path to facing point.
-
-
-<Callout title="Tip" type="info">
-    Specific heading interpolations are explained in more detail on the [Interpolation](interpolation) page.
-</Callout>
+Reference the [Interpolation](interpolation) page for information on the usage and types of available interpolations.
