@@ -5,7 +5,9 @@
     "interpolation",
     "deceleration",
     "coordinates",
-    "constraints",
+    "endconstraints",
+    "pathconstraints",
+    "foresightoptions",
     "beziercurves",
     "velocity",
     "follow-state"

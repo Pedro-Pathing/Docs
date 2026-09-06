@@ -5,13 +5,13 @@ description: The Constants file
 
 You may have noticed that there is a `Constants` file in the `pedroPathing`
 package. This is where you configure all your constants for Pedro. It
-contains four types of constants:
+contains three types of constants:
 
-1. **Foresight (Algorithm) constants** consist of values from the
+1. **Foresight (Algorithm) constants** contains values from the
 automatic tuners.
-2. **Drivetrain constants** contain constants specific to your drivetrain
+2. **Drivetrain constants** contains constants specific to your drivetrain
 type. For example, mecanum drivetrain constants contain the motor names.
-3. **Localizer constants** contain constants specific to your localizer. For
+3. **Localizer constants** contains constants specific to your localizer. For
 example, OTOS constants include the hardware map name of the OTOS and the
 offset.
 
@@ -22,40 +22,16 @@ Below is a starting `Constants` file. The different tuning pages will guide
 you through modifying it to suit your robot.
 
 ```java title="Constants.java"
-public static MecanumConfig mecanumConfig = new MecanumConfig(
-            c -> {
-                c.frontLeftName.set("lf");
-                c.backLeftName.set("lb");
-                c.frontRightName.set("rf");
-                c.backRightName.set("rb");
-                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
-                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
-                c.manualBrakeMode.set(true);
-            }
-    );
-    //We will replace this with the Localizer you are using later
-    
-    public static PinpointConfig pinpointConfig = new PinpointConfig(
-            c -> {
-                c.name.set("pinpoint");
-                c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-                c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-                c.xPodOffset.set(0.0);
-                c.yPodOffset.set(0.0);
-                c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-            }
-    );
-
-    public static ForesightConfig foresightConfig = new ForesightConfig(
-            c -> {
-                c.linearBrakeCoefficients.set(Matrix.diag(0.0788, 0.0788));
-                c.quadraticBrakeCoefficients.set(Matrix.diag(.00191035, .00191035));
-            }
-    );
+public class Constants {
 
     public static Follower create(HardwareMap h) {
-        return new Follower(new Pinpoint(h, pinpointConfig), new Mecanum(h, mecanumConfig), new Foresight(foresightConfig));
+        return new Follower(
+            //Localizer,
+            //Drivetrain,
+            //Foresight
+        );
     }
+}
 ```
+
+Now that we have finished setting everything up we can start [tuning](tuning) the robot.

@@ -3,42 +3,17 @@ title: Introduction
 description: What is Pedro Pathing?
 ---
 
-Pedro Pathing is a **path follower** initially developed by [FTC
-team 10158](https://ftcscout.org/teams/10158?season=2023) to revolutionize
-autonomous navigation in robotics. Pedro Pathing uses Bézier curves, PIDF
-control, centripetal force correction, and more to provide smooth, fast, and
-accurate path following.
+Pedro Pathing is a **path following library** developed to revolutionize autonomous navigation in robotics.
+
+Pedro Pathing uses GVF-based feedforward + feedback control and a time-independent formulation directly accounting for loop time-based lag, and generates brake profile based on identified system dynamics for faster and more accurate autonomous routines.
 
 Using Pedro Pathing for your autonomous routines allows for:
 
-- **Faster path execution:** Pedro Pathing uses four vectors to calculate
-optimal wheel powers.
-- **Correction for disturbances:** Since localization allows Pedro Pathing
-to know your robot's position, it can correct for disturbances and get back
-on the path.
-- **Creating paths on-the-fly:** Since Pedro Pathing uses PID control, it
-can instantly go to any position.
+- **Faster path execution:** Vector prioritization is optimized for speed and accuracy.
+- **Correction for disturbances:** Pedro corrects for disturbances and swiftly returns to the path after deviations.
+- **Creating paths on-the-fly:** Pedro Pathing allows for dynamic path creation, enabling your robot to adapt pathing in real time.
+- **Visual path generation:** Pedro Pathing's Visualizer allows for quick and intuitive path generation from simple lines to complex Bézier curves. 
 
-No matter how good your team is, Pedro Pathing can give you the tools
-necessary to create high-quality, fast, consistent autos.
+Whether you are a rookie team looking for a simple and intuitive pathing library or a veteran team looking for faster autos, Pedro Pathing has the tools to build fast and reliable routines easily.
 
-## Prerequisites
-
-To use Pedro Pathing, you must:
-
-- **Have an omnidirectional drive**, such as mecanum, x-drive, or swerve.
-This is most drives except for tank.
-- **Have some form of localization**. This can be dead wheels, the goBILDA
-Pinpoint, Octoquad,
-the SparkFun OTOS, or more.
-- **Be using Android Studio**. Pedro Pathing does not work with OnBot Java
-or Blocks. If you are not using Android Studio, you should give it a try!
-
-## Tuning
-
-For Pedro Pathing to work properly with your robot, it must be tuned first.
-This process is designed to be very approachable and should take at most a
-few hours.
-
-Pedro Pathing also requires localization, or knowing where your robot is on
-the field. There are many forms of localization for you to choose from.
+**Next Steps:** Check out the [Prerequisites & Requirements](/docs/prerequisites) before getting started.

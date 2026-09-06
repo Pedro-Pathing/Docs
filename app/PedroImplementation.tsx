@@ -16,6 +16,6 @@ export default function PedroImplementation() {
 
     return (
         <DynamicCodeBlock lang="groovy"
-                          code={`implementation 'com.pedropathing:revhub:${latestVersion}'\nimplementation 'com.pedropathing:telemetry:1.0.0'`}/>
+                          code={`implementation 'com.pedropathing:revhub:${latestVersion}'\nimplementation 'com.pedropathing:tuning:1.0.0'`}/>
     )
 }

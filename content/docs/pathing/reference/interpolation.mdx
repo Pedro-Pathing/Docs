@@ -1,12 +1,46 @@
 ---
 title: Interpolation
 ---
+
+## What is Interpolation?
 Interpolation controls how the robot's heading (the direction it faces) changes while following a path.  
 Pedro Pathing supports many types of interpolation when following paths.
 
+## Interpolation on Path(s)
+
+When creating a path with other paths embedded, you can set the interpolation of the entire path or set the interpolation of individual paths within the path.
+
+### Individual Path Interpolation
+
+If you have a path that is made up of a line and a curve:
+
+```java
+Path line = Paths.line(start, end).linear(start, end);
+Path curve = Paths.curve(start, control, end).tangent();
+Path path = Paths.path(line, curve);
+```
+
+The `line` path will have linear interpolation, while the `curve` path will have tangent interpolation.
+
+### Global Path Interpolation
+
+If you set the interpolation of the entire path:
+
+```java
+Path line = Paths.line(start, end).linear(start, end);
+Path curve = Paths.curve(start, control, end).tangent();
+Path path = Paths.path(line, curve).tangent();
+```
+
+The entire path will have tangent interpolation, and the individual interpolations of the `line` and `curve` paths will be overridden.
+
+## Interpolation Types
+
 For each interpolation, let's assume `start` is the start Pose of the `path` and `end` is the end Pose of the `path`.
 
----
+<Callout title="Note" type="info">
+    Each interpolation type can either accept a Pose or a heading (in radians) as an argument. If a Pose is provided, the heading of pose will be used.
+</Callout>
 
 ### Tangent
 * Tangent is the simplest form of interpolation where the heading of the robot is tangent to the path. This is the default interpolation type when you create a path.
@@ -14,8 +48,6 @@ For each interpolation, let's assume `start` is the start Pose of the `path` and
 ```java
 path = path.tangent();
 ```
-
----
 
 ### Linear
 * Linear interpolation is an interpolation type where the heading of the robot is linearly interpolated between the start and end headings of the path. This means that the heading of the robot will change at a constant rate as it moves along the path.
@@ -25,8 +57,6 @@ path = path.tangent();
 path = path.linear(start, end);
 ```
 
----
-
 ### Constant
 * Constant interpolation is an interpolation type where the heading of the robot is constant throughout the path.
 * **Arguments:** Accepts either a Pose or a heading (in radians) as an argument. If a Pose is provided, the heading of pose will be used.
@@ -35,8 +65,6 @@ path = path.linear(start, end);
 path = path.constant(start);
 ```
 
----
-
 ### Facing Point
 * Facing point interpolation is an interpolation type where the heading of the robot is always facing a specific point.
 * **Arguments:** Accepts either a Pose or a Vector2D as an argument. If a Pose is provided, the position of pose will be used.
@@ -44,8 +72,6 @@ path = path.constant(start);
 ```java
 path = path.facingPoint(end);
 ```
-
----
 
 ### Piecewise
 * Piecewise interpolation is an interpolation type where the heading of the robot is interpolated between multiple interpolations in different segments of the path.
@@ -57,9 +83,9 @@ path = path.heading(
         .until(1, Interpolator.linear(start, end))
 );
 ```
-* **Explanation:** This creates a piecewise interpolation where the heading follows the path tangent until `t = 0.5` (about halfway through the path), then linearly interpolates between the start and end headings until `t = 1`. `t` is the normalized path parameter (start = 0, end = 1).
-
----
+This creates a piecewise interpolation where the heading follows the path tangent until `t = 0.5` (about halfway through the path),
+then linearly interpolates between the start and end headings until `t = 1`. `t` is the normalized path parameter (start = 0, end = 1).
 
 ### Custom
-* Custom interpolation is an interpolation type where the heading of the robot is interpolated using a custom interpolator. This allows for more complex interpolation types that are not covered by the other interpolation types.
+* Custom interpolation is an interpolation type where the heading of the robot is interpolated using a custom interpolator.
+This allows for more complex interpolation types that are not covered by the other interpolation types.

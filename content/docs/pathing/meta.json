@@ -1,6 +1,7 @@
 {
   "pages": [
     "index",
+    "prerequisites",
     "installation",
     "constants",
     "tuning",
