@@ -1,0 +1,77 @@
+---
+title: Controllers
+---
+
+Pedro Pathing uses Controllers to correct for various kinds of error (heading error, lateral/sideways error from the path, forward/backwards error) that the robot gets while following a path. The three kinds of Controllers that Pedro's Foresight algorithm uses are:
+    - `forwardTranslational`: Corrects for forwards/backwards error
+    - `strafeTranslational`: Corrects for lateral (sideways) error
+    - `headingFeedback`: Corrects for heading error
+
+<Callout title="Note" type="info">
+    Unlike previous versions of Pedro Pathing, you usually only need the Proportional term in the controller. The integral and derivative term are unneeded.
+</Callout>
+
+To create a Proportional controller, navigate to the `Constants` page and scroll down until you see the `foresightConfig` method. In the `foresightConfig` method, type
+```java
+Controller controller_name = Controller.proportional(int kP);
+```
+The controller scales and returns the error it receives by a factor of `kP`.
+
+To assign that controller to a controller that Foresight uses, such as `forwardTranslational`, type
+```java
+c.forwardTranslational.set(Controller.piecewise(smallTranslationalForward).put(2.5, largeTranslationalForward));
+```
+in the `foresightConfig` method.
+
+### Piecewise Controllers
+
+Piecewise controllers allow you to "combine" multiple controllers into one, where each controller has a specific domain for when it's used.
+
+Suppose you have already created a controller called `controller1`. You can add that controller onto a piecewise controller named `finalController` by typing
+```java title="Constants.java"
+    PiecewiseController finalController = Controller.piecewise(controller1);
+```
+If you have another controller named `controller2` that you want to add to `finalController`, type
+```java title="Constants.java"
+    finalController.put(threshold, controller2);
+```
+Now, `finalController` will use `controller1` if the error that `finalController` receives is less than `threshold`. If the error `finalController` receives is greater than `threshold`, it will use `controller2` instead.
+You can add more controllers to `finalController`, but that generally isn't needed.
+
+Piecewise controllers are very useful when you want them to behave in certain ways based on the size of the error its given.
+For example, a piecewise controller could consist of one controller that handles small errors (the small controller) and another controller that handles large errors (the large controller).
+Specifically, in the ForesightConfig method, you can type
+```java title="Constants.java"
+    Controller largeTranslationalForward = Controller.proportional(.3);
+    Controller smallTranslationalForward = Controller.proportional(.1);
+    c.forwardTranslational.set(Controller.piecewise(smallTranslationalForward).put(threshold, largeTranslationalForward));
+```
+With this setup, you can tune the large controller to correct more aggressively (give it a larger `kP` value) than the small controller does (give it a smaller `kP` value).This enables the robot to correct quickly from larger errors while minimizing overshoot and oscillations when correcting from smaller errors.
+This can similarly be done for `translationalLateral` and `headingFeedback` controllers.
+
+### Feedforward
+The static feedforward sends a small amount of power to the drivetrain motors to compensate for the friction with the motors, wheels, and ground.
+To add a feedforward to a controller, add
+```java title="Constants.java"
+    .plus(Controller.staticFeedforward(int power))
+```
+to the controller you want to modify.
+If the static feedforward is set too high, this may cause the motors to be given too much power, causing the robot to overshoot or jitter.
+
+### Other Methods
+The `plus` and `minus` methods allow you to add or subtract the outputs of two controllers. For example, if you have already created two controllers, `controller1` and `controller2`, then
+```java title="Constants.java"
+    controller1.plus(controller2);
+```
+gives a controller that adds the two values returned by `controller1` and `controller2`.
+On the other hand,
+```java title="Constants.java"
+    controller1.minus(controller2);
+```
+gives a controller that subtracts the two values returned by `controller1` and `controller2`.
+
+The `times` method scales the values returned by a controller. For example,
+```java title="Constants.java"
+    controller1.times(double scalar);
+```
+will give a controller that returns the output of `controller1` multiplied by `scalar`.
