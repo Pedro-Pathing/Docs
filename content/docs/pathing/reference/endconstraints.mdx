@@ -1,0 +1,109 @@
+---
+title: End Constraints
+description: Constraints that determine when a path segment is considered complete
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+
+**End Constraints** control when a path segment (and the overall path) is considered **finished**. All of the **End Constraints** are configured in `ForesightConfig`.
+
+<Callout type="info">
+**How Path Completion Works:**  
+A path segment completes once the robot reaches the **Parametric T** threshold **AND** either:
+1. The **Translational**, **Heading**, and **Velocity** conditions are all satisfied simultaneously, **OR**
+2. The **Timeout** duration expires after parametric completion.
+</Callout>
+
+### Parametric T
+
+`parametricTConstraint` defines how close the robot's progress along the Bézier curve ($t \in [0, 1]$) must be to `1` before the path segment is considered parametrically complete.
+
+The default value is `0.025`, meaning the closest t-value must reach at least `0.975`.
+
+```java
+c.parametricTConstraint.set(0.025);
+```
+
+Increasing this value allows the path to reach its parametric end earlier, while decreasing it requires the robot to get closer to `t = 1`.
+
+### Velocity
+
+`velocityConstraint` sets the velocity threshold used while correcting at the final Pose. This prevents the path from completing when the robot is still moving fast.
+
+The default value is `0.1` inches/second.
+
+The robot's velocity must be lower than the threshold for the velocityConstraint to be met.
+
+```java
+c.velocityConstraint.set(0.1);
+```
+
+### Translational
+
+`translationalConstraint` sets the maximum allowed distance between the robot's position and the final target position.
+
+The default value is `0.1` inches.
+
+```java
+c.translationalConstraint.set(0.1);
+```
+
+The translational error must be below this value for the translational constraint to be met.
+
+### Heading
+
+`headingConstraint` sets the maximum allowed heading error between the robot's heading and the final target heading.
+
+The value is in radians, and the default is `0.007` radians (~0.4 degrees).
+
+```java
+c.headingConstraint.set(0.007);
+```
+
+`Math.toRadians()` can also be used when setting the value:
+
+```java
+c.headingConstraint.set(Math.toRadians(0.4));
+```
+
+The heading error must be below this value for the heading constraint to be met.
+
+### Timeout
+
+`timeoutConstraint` sets how long, in milliseconds, the follower is allowed to correct at the final Pose before the timeout constraint is met.
+
+The default value is `100` milliseconds.
+
+```java
+c.timeoutConstraint.set(100.0);
+```
+
+Increasing the timeout gives the robot more time to correct at the endpoint. Decreasing it allows the follower to finish sooner if the other endpoint constraints cannot be met.
+
+### Setting End Constraints
+
+End Constraints can be changed in `ForesightConfig` alongside the other follower constants:
+
+```java
+public static ForesightConfig foresightConfig = new ForesightConfig(
+    c -> {
+        c.parametricTConstraint.set(0.025);
+        c.velocityConstraint.set(0.1);
+        c.translationalConstraint.set(0.1);
+        c.headingConstraint.set(0.007);
+        c.timeoutConstraint.set(100.0);
+
+        // Other Foresight constants...
+    }
+);
+```
+
+### Path Completion
+
+During path following, the current path reaches its parametric end when `parametricTConstraint` is met.
+
+At the final endpoint, when endpoint holding is enabled, the follower corrects toward the final Pose. `follower.isBusy()` becomes false when the velocity, translational, and heading constraints are all met, or when the timeout is reached.
+
+<Callout title="Tip" type="info">
+    If the follower takes too long to finish at the endpoint, check the final position, heading, and velocity errors before changing the constraints. Increasing `parametricTConstraint` reaches the parametric end earlier, while decreasing `timeoutConstraint` reduces how long the follower continues correcting at the end.
+</Callout>

@@ -1,0 +1,37 @@
+---
+title: Constants
+description: The Constants file
+---
+
+You may have noticed that there is a `Constants` file in the `pedroPathing`
+package. This is where you configure all your constants for Pedro. It
+contains three types of constants:
+
+1. **Foresight (Algorithm) constants** contains values from the
+automatic tuners.
+2. **Drivetrain constants** contains constants specific to your drivetrain
+type. For example, mecanum drivetrain constants contain the motor names.
+3. **Localizer constants** contains constants specific to your localizer. For
+example, OTOS constants include the hardware map name of the OTOS and the
+offset.
+
+There is also a `create` method that constructs the follower. You
+will call this method in your OpModes.
+
+Below is a starting `Constants` file. The different tuning pages will guide
+you through modifying it to suit your robot.
+
+```java title="Constants.java"
+public class Constants {
+
+    public static Follower create(HardwareMap h) {
+        return new Follower(
+            //Localizer,
+            //Drivetrain,
+            //Foresight
+        );
+    }
+}
+```
+
+Now that we have finished setting everything up we can start [tuning](tuning) the robot.
