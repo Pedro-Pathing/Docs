@@ -85,7 +85,7 @@ Most coaxial swerve drivetrains in FTC use the analog encoders on their rotation
 values should vary between 0 and 3.3V, but in practice the min and max voltages are often close but not exactly those.
 
 To get the most precision out of your pods, you want to get the actual minimum and maximum voltages of your encoders.
-To do this, run the [Analog Min / Max Tuner](docs/swerve/AnalogMinMaxTuner.java) opmode. After you press start, slowly rotate each
+To do this, run the [Analog Min / Max Tuner](https://github.com/Pedro-Pathing/Docs/blob/master/public/docs/swerve/AnalogMinMaxTuner.java) opmode. After you press start, slowly rotate each
 pod four to five full rotations. The min and max voltages of each pod should be printed to telemetry.
 
 Once you have the values for each pod, add the following lines to each of your CoaxialPodConfig objects:
@@ -118,7 +118,7 @@ c.angleOffsetRad.set(offset_in_radians);
 ## Motor Directions
 After you put your angle offsets in, we need to confirm that they are correct and that the motors are reversed correctly. First, if you haven't already,
 put in the placeholder pod PIDF coefficients for each pod (kP = 0.3, kI = 0, kD = 0.005, kF = 0) --- this was already done in the first step if you've been following along.
-Then, run the [SwerveOffsetsTuner](docs/swerve/SwerveOffsetsTuner.java) opmode (do this off the ground, the servos and motors will spin). This opmode will attempt to drive each pod to its zero position. However, there are a few
+Then, run the [SwerveOffsetsTuner](https://github.com/Pedro-Pathing/Docs/blob/master/public/docs/swerve/SwerveOffsetsTuner.java) opmode (do this off the ground, the servos and motors will spin). This opmode will attempt to drive each pod to its zero position. However, there are a few
 expected reasons for this to fail. Follow these debug steps for each type of failure:
 1. **The pods oscillate a lot**: By far the most common issue here is that your servos (not encoders) need to be reversed. Reverse your servos
 and try again. If the issue persists, try turning down the default PIDF coefficients and see if that helps.
@@ -136,7 +136,7 @@ that all of your servo, encoder, and motor wires are plugged in to the correct p
 Once all your servos move to their zero positions, now you can check the directions of your motors. The pods should all be rotating to move the robot forward
 (regardless of whether the pods are facing forward or backward). Reverse all the motors in pods that are turning the wrong direction. You can do this by changing the corresponding direction in the `CoaxialPodConfig`.
 
-If you have completed all of the above steps correctly, when running [SwerveOffsetsTuner](docs/swerve/SwerveOffsetsTuner.java), the robot should drive forward slowly when you put it on the ground.
+If you have completed all of the above steps correctly, when running [SwerveOffsetsTuner](https://github.com/Pedro-Pathing/Docs/blob/master/public/docs/swerve/SwerveOffsetsTuner.java), the robot should drive forward slowly when you put it on the ground.
 
 ## Lateral Offsets
 Now you need to find in your lateral offset (as a `Vector2D`). These not tuned, but found through measurement on the robot or CAD. Lateral offsets represent
@@ -159,17 +159,17 @@ c.podOffset.set(Vector2D.cartesian(offsetX, offsetY));
 
 ## Encoder Directions
 Next, we need to confirm that the encoders are reversed correctly. First, take your robot off of the ground such that you can see the wheels:
-then, run the [SwerveTurnTuner](docs/swerve/SwerveTurnTuner.java) opmode. Your pods should turn to be perpendicular to the center of the robot, forming
+then, run the [SwerveTurnTuner](https://github.com/Pedro-Pathing/Docs/blob/master/public/docs/swerve/SwerveTurnTuner.java) opmode. Your pods should turn to be perpendicular to the center of the robot, forming
 an "O" shape so the robot can turn. If your pods all turn towards the center and form an "X" shape, then reverse all of your encoders (flip the boolean
 parameter) and try again.
 
 Once your pods face the correct direction, ensure that the motors are all running the correct direction to turn the robot counterclockwise. If any of
-the motors are running the wrong direction, but they are all correct for the [SwerveOffsetsTuner](docs/swerve/SwerveOffsetsTuner.java) to move your robot forward, then you almost certainly
+the motors are running the wrong direction, but they are all correct for the [SwerveOffsetsTuner](https://github.com/Pedro-Pathing/Docs/blob/master/public/docs/swerve/SwerveOffsetsTuner.java) to move your robot forward, then you almost certainly
 have a wiring issue. Make sure that all of your motors correctly match up with their corresponding servos and encoders in your config. If that still
 doesn't work, check your lateral offsets.
 
 ## Pod PIDF Tuning
-Finally, you need to tune your pod PIDF coefficients. Run the [SwervePIDTuner](docs/swerve/SwervePIDTuner.java) opmode to tune your PIDs. You can do this using whatever method you prefer to tune your PIDFs. What I've found to work
+Finally, you need to tune your pod PIDF coefficients. Run the [SwervePIDTuner](https://github.com/Pedro-Pathing/Docs/blob/master/public/docs/swerve/SwervePIDTuner.java) opmode to tune your PIDs. You can do this using whatever method you prefer to tune your PIDFs. What I've found to work
 best is to first tune P and D while the robot is off the ground. Try to increase `P` until you get something decently aggressive without introducing too many oscillations, and then raise `D` to mitigate any remaining oscillation. Once you've tuned to your satisfaction,
 move the robot onto the ground and tune F to account for the friction with the tiles and fine tuning P and D. For my bot, I've used the same P and D
 for all four pods, but I have separate F values for the front and back pods because my robot is back heavy. You should adjust this for your robot's
