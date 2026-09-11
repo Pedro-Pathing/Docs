@@ -1,14 +1,14 @@
 ---
-title: Teleop Usage
-description: How to use Pedro in teleop
+title: TeleOp Usage
+description: How to use Pedro in TeleOp
 ---
 The follower can also control the drivetrain during TeleOp.
 
-Unlike the autonomous guides, we'll start a separate TeleOp OpMode.
+Unlike the autonomous guides, we'll start a new OpMode for TeleOp.
 
 ### Creating the Follower
 
-Create the follower inside `init()` just like in autonomous:
+Create the follower inside `init()`, just like in autonomous:
 
 ```java
 private Follower follower;
@@ -171,18 +171,18 @@ public void loop() {
 ```
 
 <Callout title="Units" type="info">
-    `follower.pose()` always returns values in inches (`x` and `y`) and radians (`heading`). Make sure to convert your units if you need to using Java's built in `Math` class
+    `follower.pose()` always returns values in inches (`x` and `y`) and radians (`heading`). Make sure to convert your units if you need to using Java's built in `Math` class.
 </Callout>
 
 You can use Pose objects in your methods (and subsystems if you use them), and send your robot's Pose to them, so you code can use your location (eg. Turrets, making sure you are in a zone)
 
 ### Overriding your position
-While localization in an auto has very little to no drift, that is just 30 seconds. 2 minutes of Teleop can have a bit of drift. 
+While localization in an auto typically has very little to no drift, autonomous lasts just 30 seconds. The 2 minutes in TeleOp can result in a bit of drift. 
 You can update your position using `follower.setPose`. 
 
-Only use this if you either have a way to relocalise (eg. a LimeLight or a camera pipeline), or you know your position (eg. in a corner). 
+Only use this if you either have a way to relocalize (eg. a LimeLight or another camera), or you know your position (eg. in a corner). 
 
-Lets add a way to relocalise in a corner to our tele-op so far
+Let's add a way to relocalize in a corner to our current TeleOp:
 ```java
 @Override
 public void loop() {
@@ -211,10 +211,10 @@ public void loop() {
 ```
 This code will set our robot's position to a corner when we press "Start".
 
-### Passing your position from Autonomous to Tele-OP
-Pedro doesn't automatically save your position during Tele-OP. You have to send it from your Autonomous to your Tele-OP manually. Pedro doesn't have a built in way for this, but there are several ways you can do this. For example, a storage class.
+### Passing your position from Autonomous to TeleOp
+Pedro doesn't automatically save your position at the end of Autonomous. You have to send it from your Autonomous to your TeleOp manually. Pedro doesn't have a built-in way for this, but there are several ways you can do this. For this example, we'll make a storage class.
 
-Create a new class, we will call it OpModeStorage: 
+Create a new class. We'll call it OpModeStorage: 
 
 ```java title="OpModeStorage.java"
 package org.firstinspires.ftc.teamcode;
@@ -228,9 +228,9 @@ public class OpModeStorage {
 }
 ```
 
-This should be accessible by your autos and tele-ops. So ideally not in any folder
+This should be accessible by your autos and TeleOp, so ideally, not in any folder.
 
-Now in your all your autonomous modes, create a `stop()` method. (`LinearOpMode` has it different), and add this line
+Now in your all your autonomous modes, create a `stop()` method. (`LinearOpMode` has it different), and add this line:
 
 ```java title="ExampleAuto.java"
 // in your autonomous
@@ -243,9 +243,9 @@ public void stop() {
 ```
 As long as your robot doesn't power off, that pose will stay saved after the OpMode ends. 
 
-Now back in your Tele-OP code, add this code in your `start()` method
+Now back in your TeleOp code, add this code in your `start()` method
 
-```java title="TeleOP.java"
+```java title="TeleOp.java"
 @Override
 public void start(){
     follower.setPose(OpModeStorage.autonomousEndPose);
@@ -253,6 +253,6 @@ public void start(){
 }
 ```
 Your autonomous will now save the Pose it is at when the OpMode is turned off, and save it in the `OpModeStorage` file. 
-Afterwards your Tele-OP will set its starting position to what it finds in OpModeStorage
+Afterwards your TeleOp will set its starting position to what it finds in OpModeStorage
 
-You can use this same method to save any other values (eg, states, patterns, etc), from your autonomous and put it into your Tele-OP
+You can use this same method to save any other values (eg, states, patterns, etc), from your autonomous and put it into your TeleOp.

@@ -94,10 +94,10 @@ export default function PedroSelector() {
 
                 </Row>
                 <Row>
-                    <Item href="https://youtube.com/@PedroPathing"
-                          title="YouTube"
+                    <Item href="https://youtube.com/playlist?list=PLE4p-72jRqZM&si=FmjRiej6UbXREd8L"
+                          title="Pedro Pathing Video Challenge"
                           iconClassName="border-red-500/65 bg-red-500/10"
-                          description="Watch our videos on YouTube"
+                          description="Watch videos about Pedro Pathing on YouTube"
                           icon={<SiYoutube className="text-red-500 size-full"/>}/>
                     <Item href="https://instagram.com/pedropathing/"
                           title="Instagram"

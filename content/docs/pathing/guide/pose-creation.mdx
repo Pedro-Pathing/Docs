@@ -9,7 +9,7 @@ description: How to create poses with PoseFactory
 
 Now that we have our Autonomous class and follower setup, it's time to start pathing. To do this we need to use `Pose`s. 
 
-A `Pose` represents a position and heading on the field using three values: `x`, `y`, and `heading`. We use the [Pedro Coordinates](/docs/pathing/reference/coordinates) system, as opposed to the standard FTC coordinate system.
+A `Pose` represents a position and heading on the field using three values: `x`, `y`, and `heading`. We use the [Pedro Coordinates](/docs/pathing/reference/coordinates) system instead of the [FTC official coordinate system](https://ftc-docs.firstinspires.org/en/latest/game_specific_resources/field_coordinate_system/field-coordinate-system.html).
 
 ### Creating a PoseFactory
 
@@ -22,7 +22,7 @@ import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 ```
 
-For this guide, we'll use degrees for our heading values. Add this line after where you initialized your follower
+For this guide, we'll use degrees for our heading values. Add this line after where you inititialized your follower:
 
 ```java
 public class ExampleAuto extends OpMode {
@@ -31,7 +31,7 @@ public class ExampleAuto extends OpMode {
     private final PoseFactory p = PoseFactory.degrees(); // add this
 ```
 
-You can use `PoseFactory.radians()` instead if you prefer radians.
+If you prefer radians, you can use `PoseFactory.radians()` instead.
 
 ### Creating the Poses
 

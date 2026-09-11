@@ -12,11 +12,11 @@ Paths can be created by using the static methods in the Paths class. The followi
 
 Let's use these poses to demonstrate each of the path creation methods:
 ```java
-PoseFactory p = PoseFactory.degrees();
+PoseFactory poseFactory = PoseFactory.degrees();
 
-Pose start = p.of(0, 0, 180); // 180 degrees 
-Pose end = p.of(10, 10, 90); // 90 degrees 
-Pose control = p.of(10, 20, 45); // 45 degrees 
+Pose start = poseFactory.of(0, 0, 180); // 180 degrees 
+Pose end = poseFactory.of(10, 10, 90); // 90 degrees 
+Pose control = poseFactory.of(10, 20, 45); // 45 degrees 
 ```
 
 <Callout title="Tip" type="info">
@@ -32,6 +32,23 @@ Path curve = Paths.curve(start, control, end);
 Path path = Paths.path(line, curve);
 ```
 
+### Recommended path usage
+We recommend using methods to return paths rather than storing them as fields. For example:
+
+```java
+public Path linePath() {
+    return Paths.line(start, end);
+}
+
+public Path curvePath() {
+    return Paths.curve(start, control, end);
+}
+
+public Path compoundPath() {
+    return Paths.path(linePath(), curvePath());
+}
+```
+This is the same format that the visualiser returns code. 
 ### Interpolation
 
 Reference the [Interpolation](interpolation) page for information on the usage and types of available interpolations.

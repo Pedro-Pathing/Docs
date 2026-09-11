@@ -26,13 +26,13 @@ you should use `follower.atParametricEnd()` instead of `!follower.isBusy()`.
 
 <Callout title="Tip" type="info">
     You can optimize your auto using more lenient conditions for this. I personally like using
-    `Math.abs(follower.tangentialVelocity()) < Constants.foresightConfig.velocityConstraint.get() && follower.distanceToEndpoint() < 4` which seems to work well.
+    `Math.abs(follower.tangentialVelocity()) < Constants.foresightConfig.velocityConstraint.get() && follower.distanceToEndpoint() < 4`, which seems to work well.
 </Callout>
 
 ### Follower States
 The `Follower` exposes several methods that allow you to monitor the robot's following state. Here are a few:
 
-- `follower.completion()` gives you, from 0 to 1, the percentage of the current path segment the robot has completed.
+- `follower.completion()` gives you, from 0 to 1, the amount of the current path segment the robot has completed.
 - `follower.remainingDistance()` gives you the distance remaining along the path for the robot to travel.
 - `follower.distanceToEndpoint()` gives you the Cartesian distance from the robot to the endpoint of the path.
 - `follower.closestPose()` gives you the closest pose on the path to the robot.
