@@ -34,6 +34,7 @@ public static CoaxialPodConfig rightBack = new CoaxialPodConfig(
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.podOffset.set(Vector2D.zero())
             }
     );
 
@@ -47,6 +48,7 @@ public static CoaxialPodConfig leftFront = new CoaxialPodConfig(
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.podOffset.set(Vector2D.zero())
             }
     );
 
@@ -60,6 +62,7 @@ public static CoaxialPodConfig leftFront = new CoaxialPodConfig(
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.podOffset.set(Vector2D.zero())
             }
     );
 
@@ -73,6 +76,7 @@ public static CoaxialPodConfig leftFront = new CoaxialPodConfig(
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.podOffset.set(Vector2D.zero())
             }
     );
 ```
