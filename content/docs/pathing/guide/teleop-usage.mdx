@@ -146,6 +146,43 @@ public void loop() {
     Field-centric driving uses the heading reported by the localizer, so make sure localization is working correctly before using it.
 </Callout>
 
+### Automatic Holding
+
+To stop the robot from getting pushed around when sticks are released, use `ManualDrive.driveOrHold()`. It automatically holds position when driver input stops.
+
+Replace `follower.manual()` with `ManualDrive.driveOrHold()`:
+
+```java
+@Override
+public void loop() {
+    ManualDrive.driveOrHold(
+            follower,
+            -gamepad1.left_stick_y,
+            gamepad1.left_stick_x,
+            gamepad1.right_stick_x
+    );
+
+    follower.update();
+}
+```
+
+You can also use `driveOrHold()` with field-centric drive powers:
+
+```java
+@Override
+public void loop() {
+    DrivePowers powers = ManualDrive.fieldCentric(
+            -gamepad1.left_stick_y,
+            gamepad1.left_stick_x,
+            gamepad1.right_stick_x,
+            follower.pose().heading()
+    );
+
+    ManualDrive.driveOrHold(follower, powers);
+    follower.update();
+}
+```
+
 ### Using Pedro's localization
 PedroPathing is always checking where your robot is on the field. You can harness this by using `follower.pose()` to get the position of your robot on the field. 
 
