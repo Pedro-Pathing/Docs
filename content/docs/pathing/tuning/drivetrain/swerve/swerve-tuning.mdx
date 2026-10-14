@@ -15,7 +15,7 @@ and then will use AutoTune to tune their algorithm's constants.
 Inside your `Constants` class, add:
 
 ```java title="Constants.java"
-public static SwerveConfig driveConfig = new SwerveConfig(
+public static SwerveConfig drivetrainConfig = new SwerveConfig(
             c -> {
                 c.zeroPowerBehavior.set(SwerveConfig.ZeroPowerBehavior.IGNORE_ANGLE_CHANGES);
                 c.manualBrakeMode.set(true);

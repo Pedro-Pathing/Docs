@@ -1,0 +1,41 @@
+---
+title: AutoTune
+description: How AutoTune works
+---
+
+### What is AutoTune
+
+AutoTune is an automatic tuning tool for Pedro Pathing that makes the process of tuning your robot's constants way easier, faster and simpler.
+
+<Callout title="Note" type="info">
+  AutoTune should already be installed if you followed the steps at [installation](/docs/pathing/installation) correctly.
+</Callout>
+
+### How AutoTune Works
+
+AutoTune uses `Sloth` to find your `@Tuner` procedures.
+
+AutoTune has two parts:
+
+- **The Robot Part:** A library running on your Robot Controller finds your `@Tuner` procedures and then runs them for the tuning.
+- **The Web Part:** A website where you select which tuner you want to use and enter values, confirm steps and get the finished constants.
+
+### How to Start Tuning
+
+1. Add `@Tuner` procedures to your `Tuning` class.
+2. Build and push your code to the Robot Controller.
+3. Connect to the Robot Controller's WiFi network.
+4. Open `http://192.168.43.1:10158` in your browser.
+
+### Compatibility with Other Libraries
+
+Since AutoTune uses `Sloth` to find the `@Tuner` procedures, different libraries that mess with class scanning like FTC Dashboard or Panels can cause problems.
+
+If you do use something that has problems with `Sloth` then you need to either:
+
+- Switch to a [compatible version](https://github.com/Dairy-Foundation/Sloth#ftc-dashboard) if one exists.
+- Tune your robot with AutoTune first, and once you are done remove it.
+
+<Callout title="Removing AutoTune" type="warning">
+  To remove AutoTune you will need to remove the `implementation 'com.pedropathing:tuning'` dependency and make sure you have deleted everything that uses AutoTune from the code.
+</Callout>

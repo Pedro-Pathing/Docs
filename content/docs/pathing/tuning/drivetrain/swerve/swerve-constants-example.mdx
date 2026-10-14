@@ -93,7 +93,7 @@ public class PedroConstants {
             }
     );
 
-    public static SwerveConfig driveConfig = new SwerveConfig(
+    public static SwerveConfig drivetrainConfig = new SwerveConfig(
             c -> {
                 c.zeroPowerBehavior.set(SwerveConfig.ZeroPowerBehavior.X_LOCK);
                 c.manualBrakeMode.set(true);
@@ -106,7 +106,7 @@ public class PedroConstants {
         CoaxialPod rightFrontPod = new CoaxialPod(h, rightFront);
         CoaxialPod leftBackPod = new CoaxialPod(h, leftBack);
         CoaxialPod rightBackPod = new CoaxialPod(h, rightBack);
-        return new Follower(new PinpointLocalizer(h, localizerConfig), new Swerve(h, driveConfig,
+        return new Follower(new PinpointLocalizer(h, localizerConfig), new Swerve(h, drivetrainConfig,
                 leftBackPod, leftFrontPod, rightBackPod, rightFrontPod), new Foresight(foresightConfig));
     }
 }
